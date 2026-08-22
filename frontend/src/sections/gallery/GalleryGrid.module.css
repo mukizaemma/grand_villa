@@ -1,0 +1,222 @@
+.section {
+  background: #ffffff;
+  padding-block: var(--space-2xl);
+}
+
+/* ── Filters ────────────────────────────────────────────── */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: var(--space-xl);
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-muted, #6b6258);
+  padding-block: var(--space-lg);
+}
+
+.filterBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  transition: background var(--transition-base), color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.filterBtn:hover {
+  border-color: var(--color-terracotta);
+  color: var(--color-charcoal);
+}
+
+.filterBtnActive {
+  background: var(--color-lake-teal);
+  border-color: var(--color-lake-teal);
+  color: var(--color-sand);
+}
+
+/* ── Masonry ────────────────────────────────────────────── */
+
+.masonry {
+  column-count: 1;
+  column-gap: var(--space-sm);
+}
+
+.masonry > * {
+  break-inside: avoid;
+  width: 100%;
+}
+
+@media (min-width: 560px) {
+  .masonry {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 860px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1180px) {
+  .masonry {
+    column-count: 4;
+  }
+}
+
+.tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  background-position: center;
+  break-inside: avoid;
+  overflow: hidden;
+}
+
+.aspectTall {
+  aspect-ratio: 3 / 4;
+}
+
+.aspectSquare {
+  aspect-ratio: 1 / 1;
+}
+
+.aspectWide {
+  aspect-ratio: 4 / 3;
+}
+
+.tileOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(8, 18, 20, 0.55) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.tile:hover .tileOverlay {
+  opacity: 1;
+}
+
+.tileCaption {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-sand);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.tile:hover .tileCaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Lightbox ───────────────────────────────────────────── */
+
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  background: rgba(8, 12, 12, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.lightboxClose {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 2;
+  color: var(--color-sand);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxArrow {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-sand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-base);
+}
+
+.lightboxArrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.lightboxStage {
+  position: relative;
+  width: min(900px, 78vw);
+  height: min(600px, 74vh);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-inline: var(--space-sm);
+}
+
+.lightboxImage {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.5s ease, transform 0.6s ease;
+}
+
+.lightboxImageActive {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.lightboxCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: var(--space-md);
+  font-size: 0.85rem;
+  color: var(--color-sand);
+  background: linear-gradient(0deg, rgba(8, 12, 12, 0.7) 0%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+  .lightboxStage {
+    width: 82vw;
+    height: 50vh;
+  }
+
+  .lightboxArrow {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -1,0 +1,28 @@
+.section {
+  background: var(--color-sand);
+  padding-block: var(--space-xl) var(--space-2xl);
+  min-height: 60vh;
+}
+
+.backHome {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  margin-bottom: var(--space-lg);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 1.6fr 1fr;
+  }
+}
