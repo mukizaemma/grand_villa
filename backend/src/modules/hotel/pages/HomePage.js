@@ -7,7 +7,11 @@ const FEATURE_ICONS = [
   { label: 'Rooms / bed', value: 'bed' },
   { label: 'Parking', value: 'parking' },
   { label: 'Restaurant', value: 'utensils' },
-  { label: 'Pool', value: 'waves' },
+  { label: 'Lake / water', value: 'waves' },
+  { label: 'Boat', value: 'ship' },
+  { label: 'Hiking / hills', value: 'mountain' },
+  { label: 'Nature', value: 'trees' },
+  { label: 'Sunrise', value: 'sunrise' },
   { label: 'Concierge', value: 'bell' },
 ]
 
@@ -76,8 +80,8 @@ export const HomePage = {
                   label: 'Secondary button',
                   admin: { width: '50%', className: 'hero-cta-card' },
                   fields: [
-                    { name: 'label', type: 'text', defaultValue: 'Explore rooms', admin: { width: '50%' } },
-                    { name: 'link', type: 'text', defaultValue: '/accommodation', admin: { width: '50%' } },
+                    { name: 'label', type: 'text', defaultValue: 'Explore the lake', admin: { width: '50%' } },
+                    { name: 'link', type: 'text', defaultValue: '/things-to-do', admin: { width: '50%' } },
                   ],
                 },
               ]),
@@ -86,7 +90,7 @@ export const HomePage = {
         },
         {
           label: 'Features',
-          description: 'Four short highlights directly under the hero.',
+          description: 'Four short highlights directly under the destination story — lake, boat, trail, apartment.',
           fields: [
             {
               name: 'features',
@@ -110,19 +114,19 @@ export const HomePage = {
           ],
         },
         {
-          label: 'Welcome',
-          admin: { hidden: true },
+          label: 'Why Karongi',
+          description: 'The story band under the hero: why this lake, this town, this apartment.',
           fields: [
             unnamedGroup('welcome', [
-              { name: 'eyebrow', type: 'text' },
-              { name: 'headline', type: 'text' },
+              { name: 'eyebrow', type: 'text', defaultValue: 'Karongi · Lake Kivu' },
+              { name: 'headline', type: 'text', defaultValue: 'A serviced apartment on Rwanda’s favourite lake' },
               { name: 'body', type: 'richText' },
               {
                 name: 'cta',
                 type: 'group',
                 fields: [
-                  { name: 'label', type: 'text' },
-                  { name: 'path', type: 'text' },
+                  { name: 'label', type: 'text', defaultValue: 'See things to do' },
+                  { name: 'path', type: 'text', defaultValue: '/things-to-do' },
                 ],
               },
               previewUpload('primaryImage'),
@@ -130,6 +134,7 @@ export const HomePage = {
               {
                 name: 'reviewBadges',
                 type: 'array',
+                admin: { hidden: true },
                 fields: [
                   { name: 'source', type: 'text' },
                   { name: 'score', type: 'number' },
@@ -145,17 +150,39 @@ export const HomePage = {
           description: 'Heading only. Individual rooms are edited under Rooms.',
           fields: [
             unnamedGroup('roomsSection', [
-              { name: 'eyebrow', type: 'text', defaultValue: 'Our rooms', admin: { width: '25%' } },
+              { name: 'eyebrow', type: 'text', defaultValue: 'Stay with us', admin: { width: '25%' } },
               {
                 name: 'headline',
                 type: 'text',
-                defaultValue: 'Find a room that feels like home',
+                defaultValue: 'An apartment base for lake days',
                 admin: { width: '75%' },
               },
               {
                 name: 'intro',
                 type: 'textarea',
-                defaultValue: 'Comfortable and affordable accommodation options.',
+                defaultValue: 'Come back to a quiet, serviced apartment after the boat, the trail, or a slow afternoon in Karongi.',
+                admin: { width: '100%' },
+              },
+            ]),
+          ],
+        },
+        {
+          label: 'Things to do',
+          description: 'Heading for the three lake-day cards on Home. Individual activities are edited under Things to do.',
+          fields: [
+            unnamedGroup('experiencesSection', [
+              { name: 'eyebrow', type: 'text', defaultValue: 'On the water & in the hills', admin: { width: '25%' } },
+              {
+                name: 'headline',
+                type: 'text',
+                defaultValue: 'What to do from the apartment',
+                admin: { width: '75%' },
+              },
+              {
+                name: 'intro',
+                type: 'textarea',
+                defaultValue:
+                  'Karongi is a place you move through — boat, paddle, walk — not only a room with a view. We help you set the days up.',
                 admin: { width: '100%' },
               },
             ]),
@@ -168,11 +195,11 @@ export const HomePage = {
           fields: [
             unnamedGroup('location', [
               textContentBlock([
-                { name: 'eyebrow', type: 'text', defaultValue: 'Our location', admin: { width: '25%' } },
+                { name: 'eyebrow', type: 'text', defaultValue: 'Karongi', admin: { width: '25%' } },
                 {
                   name: 'headline',
                   type: 'text',
-                  defaultValue: 'Close to the work — and the views',
+                  defaultValue: 'On the western shore of Lake Kivu',
                   admin: { width: '75%' },
                 },
                 { name: 'body', type: 'richText' },

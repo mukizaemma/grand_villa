@@ -9,6 +9,13 @@ import { apiClient } from '@lib/apiClient'
 import { adaptRoom, mediaUrl } from '../adapters'
 import { asPlain } from '@lib/richText'
 import { DEFAULT_HOME_FEATURES } from '../homeFeatures'
+import {
+  DESTINATION,
+  EXPERIENCES_SECTION,
+  HOME_CTA,
+  LOCATION_HIGHLIGHTS,
+  ROOMS_SECTION,
+} from '../lakeStay'
 
 async function fetchHomePage() {
   const [pageRes, roomsRes] = await Promise.all([
@@ -41,12 +48,27 @@ async function fetchHomePage() {
         link: page.hero?.cta?.link || '/book',
       },
       secondaryCta: {
-        label: page.hero?.secondaryCta?.label || 'Explore rooms',
-        link: page.hero?.secondaryCta?.link || '/accommodation',
+        label: page.hero?.secondaryCta?.label || 'Explore the lake',
+        link: page.hero?.secondaryCta?.link || '/things-to-do',
       },
     },
 
     features: features.length ? features : DEFAULT_HOME_FEATURES,
+
+    destination: {
+      eyebrow: page.welcome?.eyebrow || DESTINATION.eyebrow,
+      headline: page.welcome?.headline || DESTINATION.headline,
+      body: asPlain(page.welcome?.body) || DESTINATION.body,
+      cta: {
+        label: page.welcome?.cta?.label || DESTINATION.cta.label,
+        path: page.welcome?.cta?.path || DESTINATION.cta.path,
+      },
+      images: {
+        primary: mediaUrl(page.welcome?.primaryImage),
+        secondary: mediaUrl(page.welcome?.secondaryImage),
+      },
+      facts: DESTINATION.facts,
+    },
 
     welcome: {
       eyebrow: page.welcome?.eyebrow,
@@ -67,9 +89,15 @@ async function fetchHomePage() {
     },
 
     roomsSection: {
-      eyebrow: page.roomsSection?.eyebrow || 'Our rooms',
-      headline: page.roomsSection?.headline || 'Find a room that feels like home',
-      intro: page.roomsSection?.intro || 'Comfortable and affordable accommodation options.',
+      eyebrow: page.roomsSection?.eyebrow || ROOMS_SECTION.eyebrow,
+      headline: page.roomsSection?.headline || ROOMS_SECTION.headline,
+      intro: page.roomsSection?.intro || ROOMS_SECTION.intro,
+    },
+
+    experiencesSection: {
+      eyebrow: page.experiencesSection?.eyebrow || EXPERIENCES_SECTION.eyebrow,
+      headline: page.experiencesSection?.headline || EXPERIENCES_SECTION.headline,
+      intro: page.experiencesSection?.intro || EXPERIENCES_SECTION.intro,
     },
 
     barRestaurant: {
@@ -92,12 +120,13 @@ async function fetchHomePage() {
     },
 
     location: {
-      eyebrow: page.location?.eyebrow || 'Our location',
-      headline: page.location?.headline || 'By the lake — and close to town',
+      eyebrow: page.location?.eyebrow || 'Karongi',
+      headline: page.location?.headline || 'On the western shore of Lake Kivu',
       body: asPlain(page.location?.body),
       highlights: (page.location?.highlights || [])
         .map((item) => item.text)
         .filter(Boolean),
+      highlightFallback: LOCATION_HIGHLIGHTS,
       cta: {
         label: page.location?.cta?.label || 'Get directions',
         path: page.location?.cta?.path || '/contact',
@@ -106,10 +135,13 @@ async function fetchHomePage() {
     },
 
     cta: {
-      eyebrow: page.cta?.eyebrow,
-      headline: page.cta?.headline,
-      body: asPlain(page.cta?.body),
-      cta: page.cta?.cta || {},
+      eyebrow: page.cta?.eyebrow || HOME_CTA.eyebrow,
+      headline: page.cta?.headline || HOME_CTA.headline,
+      body: asPlain(page.cta?.body) || HOME_CTA.body,
+      cta: {
+        label: page.cta?.cta?.label || HOME_CTA.cta.label,
+        path: page.cta?.cta?.path || HOME_CTA.cta.path,
+      },
       backgroundImage: mediaUrl(page.cta?.backgroundImage),
     },
 

@@ -9,7 +9,30 @@
 import axios from 'axios'
 import { toast } from 'sonner'
 
-export const CMS_URL = import.meta.env.VITE_CMS_URL || 'http://localhost:3000'
+/**
+ * Public origin of Payload (/api, /admin, media).
+ *
+ * Vite inlines VITE_* at `npm run build`. In production, never fall back
+ * to localhost — visitors' browsers would call their own machine.
+ * Empty or localhost in a production build uses same-origin so nginx
+ * can proxy /api on this host.
+ */
+function cmsOrigin() {
+  const fromEnv = String(import.meta.env.VITE_CMS_URL || '')
+    .trim()
+    .replace(/\/$/, '')
+
+  if (import.meta.env.PROD) {
+    if (!fromEnv || /localhost|127\.0\.0\.1/.test(fromEnv)) {
+      return ''
+    }
+    return fromEnv
+  }
+
+  return fromEnv || 'http://localhost:3000'
+}
+
+export const CMS_URL = cmsOrigin()
 
 export const apiClient = axios.create({
   baseURL: CMS_URL,

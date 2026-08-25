@@ -37,30 +37,39 @@ export default function HomeCTA() {
             <h2 className={styles.headline}>{headline}</h2>
             <p className={styles.body}>{body}</p>
 
-            <Link to={cta.path} className={styles.ctaBtn}>
-              {cta.label}
-            </Link>
+            {cta?.path ? (
+              <Link to={cta.path} className={styles.ctaBtn}>
+                {cta.label || 'Book your stay'}
+              </Link>
+            ) : null}
 
             <div className={styles.divider} />
 
             <div className={styles.locationRow}>
               <div className={styles.locationItem}>
                 <MapPin size={16} className={styles.locationIcon} />
-                <span>{address}</span>
+                <span>{address || 'Karongi, Western Province, Rwanda'}</span>
               </div>
               <div className={styles.locationItem}>
                 <Clock size={16} className={styles.locationIcon} />
-                <span>{distanceFromKigali}</span>
+                <span>{distanceFromKigali || 'About 3 hours from Kigali'}</span>
               </div>
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.directionsLink}
-              >
-                <Navigation size={15} />
-                Get Directions
-              </a>
+              {mapUrl ? (
+                <a
+                  href={mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.directionsLink}
+                >
+                  <Navigation size={15} />
+                  Get Directions
+                </a>
+              ) : (
+                <Link to="/contact" className={styles.directionsLink}>
+                  <Navigation size={15} />
+                  Get Directions
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { asHtml, htmlToLexical } from '@lib/richText'
 import { DEFAULT_HOME_FEATURES } from '@features/hotel/homeFeatures'
 import { DEFAULT_RESTAURANT_FEATURES } from '@features/hotel/restaurantSpotlight'
 import { LOCATION_HIGHLIGHTS } from '@features/hotel/brand'
+import { EXPERIENCES_SECTION, ROOMS_SECTION } from '@features/hotel/lakeStay'
 import { staffClient, mediaId } from '../api/staffClient'
 import MediaField from '../components/MediaField'
 import MediaGalleryField from '../components/MediaGalleryField'
@@ -19,7 +20,11 @@ const FEATURE_ICON_OPTIONS = [
   { value: 'bed', label: 'Rooms / bed' },
   { value: 'parking', label: 'Parking' },
   { value: 'utensils', label: 'Restaurant' },
-  { value: 'waves', label: 'Pool' },
+  { value: 'waves', label: 'Lake / water' },
+  { value: 'ship', label: 'Boat' },
+  { value: 'mountain', label: 'Hiking / hills' },
+  { value: 'trees', label: 'Nature' },
+  { value: 'sunrise', label: 'Sunrise' },
   { value: 'bell', label: 'Concierge' },
 ]
 
@@ -119,8 +124,8 @@ function readPage(slug, page) {
       slides: slides.length ? slides : [emptySlide()],
       cta: { label: page.hero?.cta?.label || 'Book your stay', link: page.hero?.cta?.link || '/book' },
       secondaryCta: {
-        label: page.hero?.secondaryCta?.label || 'Explore rooms',
-        link: page.hero?.secondaryCta?.link || '/accommodation',
+        label: page.hero?.secondaryCta?.label || 'Explore the lake',
+        link: page.hero?.secondaryCta?.link || '/things-to-do',
       },
       features: features.length ? features : DEFAULT_HOME_FEATURES.map((item) => emptyFeature(item)),
       welcome: {
@@ -140,13 +145,18 @@ function readPage(slug, page) {
         })),
       },
       roomsSection: {
-        eyebrow: page.roomsSection?.eyebrow || 'Our rooms',
-        headline: page.roomsSection?.headline || 'Find a room that feels like home',
-        intro: page.roomsSection?.intro || 'Comfortable and affordable accommodation options.',
+        eyebrow: page.roomsSection?.eyebrow || ROOMS_SECTION.eyebrow,
+        headline: page.roomsSection?.headline || ROOMS_SECTION.headline,
+        intro: page.roomsSection?.intro || ROOMS_SECTION.intro,
+      },
+      experiencesSection: {
+        eyebrow: page.experiencesSection?.eyebrow || EXPERIENCES_SECTION.eyebrow,
+        headline: page.experiencesSection?.headline || EXPERIENCES_SECTION.headline,
+        intro: page.experiencesSection?.intro || EXPERIENCES_SECTION.intro,
       },
       location: {
-        eyebrow: page.location?.eyebrow || 'Our location',
-        headline: page.location?.headline || 'Close to the work — and the views',
+        eyebrow: page.location?.eyebrow || 'Karongi',
+        headline: page.location?.headline || 'On the western shore of Lake Kivu',
         body: asHtml(page.location?.body),
         highlights: locationHighlights.length ? locationHighlights : [...LOCATION_HIGHLIGHTS],
         ctaLabel: page.location?.cta?.label || 'Get directions',
@@ -247,6 +257,11 @@ function writePage(slug, current, form) {
         eyebrow: form.roomsSection.eyebrow,
         headline: form.roomsSection.headline,
         intro: form.roomsSection.intro,
+      },
+      experiencesSection: {
+        eyebrow: form.experiencesSection.eyebrow,
+        headline: form.experiencesSection.headline,
+        intro: form.experiencesSection.intro,
       },
       location: {
         eyebrow: form.location.eyebrow,
@@ -370,8 +385,8 @@ export default function StaffPages() {
     <div className="staffPage">
       <h1>Pages</h1>
       <p className="staffLead">
-        Same sections as the public site. Home includes hero, features, rooms heading,
-        bar &amp; restaurant, location, and the closing banner. Lists like rooms are edited in their
+        Same sections as the public site. Home leads with the lake story, things to do,
+        then rooms, dining, and location. Lists like rooms and activities are edited in their
         own menus.
       </p>
       <div className="staffCard">
@@ -533,6 +548,88 @@ export default function StaffPages() {
                     Add feature
                   </button>
                 </div>
+
+                <div className="full">
+                  <strong>Why Karongi</strong>
+                  <p className="staffLead">The story band under the hero — lake, town, apartment.</p>
+                </div>
+                <label className="staffField col-3">
+                  Eyebrow
+                  <input
+                    value={form.welcome.eyebrow}
+                    onChange={(e) => patchWelcome({ eyebrow: e.target.value })}
+                  />
+                </label>
+                <label className="staffField col-9">
+                  Headline
+                  <input
+                    value={form.welcome.headline}
+                    onChange={(e) => patchWelcome({ headline: e.target.value })}
+                  />
+                </label>
+                <div className="staffField full">
+                  <SummernoteField
+                    label="Body"
+                    value={form.welcome.body}
+                    onChange={(body) => patchWelcome({ body })}
+                  />
+                </div>
+                <label className="staffField col-6">
+                  Button label
+                  <input
+                    value={form.welcome.ctaLabel}
+                    onChange={(e) => patchWelcome({ ctaLabel: e.target.value })}
+                  />
+                </label>
+                <label className="staffField col-6">
+                  Button path
+                  <input
+                    value={form.welcome.ctaPath}
+                    onChange={(e) => patchWelcome({ ctaPath: e.target.value })}
+                  />
+                </label>
+
+                <div className="full">
+                  <strong>Things to do heading</strong>
+                  <p className="staffLead">Individual activities are edited under Things to do.</p>
+                </div>
+                <label className="staffField col-3">
+                  Eyebrow
+                  <input
+                    value={form.experiencesSection.eyebrow}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        experiencesSection: { ...form.experiencesSection, eyebrow: e.target.value },
+                      })
+                    }
+                  />
+                </label>
+                <label className="staffField col-9">
+                  Headline
+                  <input
+                    value={form.experiencesSection.headline}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        experiencesSection: { ...form.experiencesSection, headline: e.target.value },
+                      })
+                    }
+                  />
+                </label>
+                <label className="staffField full">
+                  Intro
+                  <textarea
+                    rows={2}
+                    value={form.experiencesSection.intro}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        experiencesSection: { ...form.experiencesSection, intro: e.target.value },
+                      })
+                    }
+                  />
+                </label>
 
                 <div className="full">
                   <strong>Rooms heading</strong>

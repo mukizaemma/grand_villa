@@ -17,7 +17,7 @@ export default function HomeLocation() {
   const body =
     location.body ||
     company.address ||
-    'Grand Villa Apartment sits in Karongi, on the shores of Lake Kivu, about a three-hour drive from Kigali.'
+    'Grand Villa is a serviced apartment in Karongi, on the western shore of Lake Kivu — about three hours from Kigali, with the lake, town, and trail at the door.'
   const directionsHref = company.mapUrl || location.cta?.path || '/contact'
   const directionsExternal = Boolean(company.mapUrl)
   const photo = location.image
@@ -27,7 +27,7 @@ export default function HomeLocation() {
       <div className={`container ${styles.grid}`}>
         <Reveal>
           <span className={styles.eyebrow}>{location.eyebrow || 'Our location'}</span>
-          <h2>{location.headline || 'By the lake — and close to town'}</h2>
+          <h2>{location.headline || 'On the western shore of Lake Kivu'}</h2>
           <p className={styles.body}>{body}</p>
           <ul className={styles.points}>
             {highlights.map((item) => (

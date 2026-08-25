@@ -27,10 +27,10 @@ export default function ThingsToDoPage() {
       <PageHero
         image={hero.backgroundImage}
         eyebrow={hero.eyebrow || 'Around Grand Villa'}
-        title={hero.headline || 'Things to do in Karongi'}
+        title={hero.headline || 'Days on Lake Kivu'}
         text={
           hero.intro ||
-          'Spend the day on Lake Kivu, in town, or on a nearby trail — then come back to the apartment, or add an experience to your stay.'
+          'Boat riding, kayaking, hiking the Congo Nile Trail — then back to the apartment in Karongi. Add an experience to your stay, or ask the desk to set the day up.'
         }
         primaryTo={hero.cta?.path || '/book'}
         primaryLabel={hero.cta?.label || 'Book your stay'}

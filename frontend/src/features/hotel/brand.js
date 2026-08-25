@@ -1,7 +1,9 @@
+export { LOCATION_HIGHLIGHTS } from './lakeStay'
+
 export const BRAND = {
   name: 'Grand Villa Apartment',
   shortName: 'Grand Villa',
-  tagline: 'Comfortable rooms, honest food, and Lake Kivu right outside.',
+  tagline: 'A serviced apartment on Lake Kivu in Karongi — boat, kayak, hike, then come home.',
   mark: 'GV',
   logo: '/images/brand/gmasters-logo.png',
 }
@@ -16,9 +18,3 @@ export const PUBLIC_NAV = [
 ]
 
 export const PUBLIC_CTA = { label: 'Book Now', path: '/book' }
-
-export const LOCATION_HIGHLIGHTS = [
-  'Serviced apartment stay by Lake Kivu in Karongi',
-  'Comfortable rooms for short visits and longer stays',
-  'About a three-hour drive from Kigali',
-]
