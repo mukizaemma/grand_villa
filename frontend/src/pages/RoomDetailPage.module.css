@@ -52,7 +52,7 @@
 }
 
 .price {
-  margin: 0 0 1rem;
+  margin: 0;
   color: var(--color-text-muted);
 }
 
@@ -60,6 +60,12 @@
   color: var(--color-gold);
   font-size: 1.45rem;
   font-family: var(--font-display);
+}
+
+.note {
+  margin: 0.35rem 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
 }
 
 .specs {

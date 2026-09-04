@@ -17,7 +17,7 @@ export default function ContactHero() {
       primaryTo={hero.cta?.path || '/book'}
       primaryLabel={hero.cta?.label || 'Book now'}
       secondaryTo={hero.secondaryCta?.path || '/accommodation'}
-      secondaryLabel={hero.secondaryCta?.label || 'See rooms'}
+      secondaryLabel={hero.secondaryCta?.label || 'See the apartment'}
     />
   )
 }

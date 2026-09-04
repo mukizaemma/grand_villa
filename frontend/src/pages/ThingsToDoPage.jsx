@@ -33,7 +33,7 @@ export default function ThingsToDoPage() {
           'Boat riding, kayaking, hiking the Congo Nile Trail — then back to the apartment in Karongi. Add an experience to your stay, or ask the desk to set the day up.'
         }
         primaryTo={hero.cta?.path || '/book'}
-        primaryLabel={hero.cta?.label || 'Book your stay'}
+        primaryLabel={hero.cta?.label || 'Book the apartment'}
         secondaryTo={hero.secondaryCta?.path || '/contact'}
         secondaryLabel={hero.secondaryCta?.label || 'Ask the desk'}
       />

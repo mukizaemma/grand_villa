@@ -14,7 +14,7 @@ export const Amenities = {
     group: false,
     useAsTitle: 'name',
     defaultColumns: ['image', 'name', 'updatedAt'],
-    description: 'Hotel amenities shown on the public site.',
+    description: 'Apartment amenities shown on the public site.',
   },
   hooks: {
     beforeValidate: [applyAutoSlug],

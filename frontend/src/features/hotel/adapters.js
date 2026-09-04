@@ -32,14 +32,33 @@ export function adaptRoom(doc) {
     id: doc.slug,
     name: doc.name,
     pricePerNight: doc.pricePerNight,
+    priceWithBreakfast: doc.priceWithBreakfast,
+    monthlyRate: doc.monthlyRate,
     units: Math.max(1, Number(doc.units) || 1),
     description: asPlain(doc.description),
     descriptionHtml: doc.description,
     specs: doc.specs || {},
     features: doc.features || [],
     image: mediaUrl(doc.image),
-    gallery: (doc.gallery || []).map((g) => mediaUrl(g.photo)),
+    gallery: (doc.gallery || []).map((g) => mediaUrl(g.photo)).filter(Boolean),
+    galleryItems: (doc.gallery || [])
+      .map((g) => ({
+        id: (typeof g.photo === 'object' && g.photo?.id) || g.id,
+        image: mediaUrl(g.photo),
+        createdAt: typeof g.photo === 'object' ? g.photo.createdAt : undefined,
+        category: 'rooms',
+      }))
+      .filter((item) => item.image),
   }
+}
+
+/** Public site sells one villa, even if older room types remain in the CMS. */
+export function pickApartment(rooms = []) {
+  if (!rooms.length) return null
+  return (
+    rooms.find((room) => /villa|apartment|grand/i.test(`${room.name || ''} ${room.id || ''}`)) ||
+    rooms[0]
+  )
 }
 
 /**

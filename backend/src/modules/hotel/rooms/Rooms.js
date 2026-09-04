@@ -4,8 +4,8 @@ import { previewUpload } from '../../../core/fields/pageHero.js'
 export const Rooms = {
   slug: 'rooms',
   labels: {
-    singular: 'Room',
-    plural: 'Rooms',
+    singular: 'Apartment',
+    plural: 'Apartment',
   },
   access: {
     read: () => true,
@@ -13,8 +13,8 @@ export const Rooms = {
   admin: {
     group: false,
     useAsTitle: 'name',
-    defaultColumns: ['image', 'name', 'units', 'pricePerNight'],
-    description: 'Prefer the staff desk for adding rooms. Slug is generated from the name.',
+    defaultColumns: ['image', 'name', 'pricePerNight', 'priceWithBreakfast', 'monthlyRate'],
+    description: 'The whole villa guests book. Keep a single listing — this is not a hotel of room types.',
   },
   hooks: {
     beforeValidate: [applyAutoSlug],
@@ -25,6 +25,37 @@ export const Rooms = {
           if (photo) data.gallery = [{ photo }]
         }
         return data
+      },
+    ],
+    afterChange: [
+      async ({ doc, req }) => {
+        const ids = (doc.gallery || [])
+          .map((item) => (typeof item.photo === 'object' ? item.photo?.id : item.photo))
+          .filter(Boolean)
+        for (const id of ids) {
+          try {
+            const media = await req.payload.findByID({
+              collection: 'media',
+              id,
+              depth: 0,
+              overrideAccess: true,
+            })
+            if (!media) continue
+            const category = media.galleryCategory
+            if (media.showOnGallery && category && category !== 'none') continue
+            await req.payload.update({
+              collection: 'media',
+              id,
+              data: {
+                showOnGallery: true,
+                galleryCategory: category && category !== 'none' ? category : 'rooms',
+              },
+              overrideAccess: true,
+            })
+          } catch {
+            /* skip a missing or unreadable file */
+          }
+        }
       },
     ],
   },
@@ -39,7 +70,20 @@ export const Rooms = {
       name: 'pricePerNight',
       type: 'number',
       required: true,
-      admin: { width: '25%' },
+      label: 'Nightly rate (no breakfast)',
+      admin: { width: '25%', description: 'USD. Grand Villa: 150 without breakfast.' },
+    },
+    {
+      name: 'priceWithBreakfast',
+      type: 'number',
+      label: 'Nightly rate with breakfast',
+      admin: { width: '25%', description: 'USD. Grand Villa: 200 with breakfast.' },
+    },
+    {
+      name: 'monthlyRate',
+      type: 'number',
+      label: 'Monthly rate',
+      admin: { width: '25%', description: 'USD for a month-long stay. Grand Villa: 2500.' },
     },
     {
       name: 'units',
@@ -49,7 +93,7 @@ export const Rooms = {
       min: 1,
       admin: {
         width: '25%',
-        description: 'How many physical rooms of this type. The website keeps the last room back when you have more than one, so OTAs or walk-ins can still take it.',
+        description: 'Leave as 1. Guests book the whole apartment, not extra copies of a room type.',
       },
     },
     {
@@ -66,7 +110,7 @@ export const Rooms = {
       name: 'description',
       type: 'richText',
       required: true,
-      admin: { description: 'Room overview. Use the staff desk editor for a simpler writing toolbar.' },
+      admin: { description: 'What the group is booking: the whole apartment, not a single hotel room.' },
     },
     {
       name: 'specs',
@@ -95,6 +139,10 @@ export const Rooms = {
         { label: 'Private Bathroom', value: 'bath' },
         { label: 'Sitting Area', value: 'sofa' },
         { label: 'Mini Fridge', value: 'fridge' },
+        { label: 'Full kitchen', value: 'kitchen' },
+        { label: 'Hot water', value: 'hot-water' },
+        { label: 'Private in-house bar', value: 'private-bar' },
+        { label: 'Boat ride for in-house guests', value: 'boat' },
       ],
     },
     previewUpload('image', { admin: { width: '25%' } }),
@@ -103,7 +151,7 @@ export const Rooms = {
       type: 'array',
       admin: {
         width: '100%',
-        description: 'Room photos in a grid. Add several at once — files over 700KB are resized first.',
+        description: 'Photos of the apartment. New images are also added to the website gallery (homepage shows the latest 4). Files over 700KB are resized first.',
         components: {
           Field: './src/components/payload/MediaGridField/index.jsx#MediaGridField',
         },

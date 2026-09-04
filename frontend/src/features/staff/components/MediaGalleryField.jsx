@@ -8,6 +8,7 @@ import styles from './MediaField.module.css'
 
 export default function MediaGalleryField({
   label = 'Photos',
+  hint = 'Choose several photos at once. Files over 700KB are resized before upload.',
   values = [],
   onChange,
   max = 12,
@@ -78,9 +79,7 @@ export default function MediaGalleryField({
   return (
     <div className={`${styles.field} ${styles.galleryField}`}>
       {label && <span className={styles.label}>{label}</span>}
-      <p className={styles.hint}>
-        Choose several photos at once. Files over 700KB are resized before upload.
-      </p>
+      {hint ? <p className={styles.hint}>{hint}</p> : null}
 
       <div className={styles.grid}>
         {items.map((item, index) => (

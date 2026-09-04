@@ -12,7 +12,7 @@ export default function RoomStayForm({ room }) {
   const { data: closures = [] } = useAvailability()
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
-  const [adults, setAdults] = useState(2)
+  const [adults, setAdults] = useState(6)
   const [closed, setClosed] = useState('')
 
   function submit(event) {
@@ -45,7 +45,8 @@ export default function RoomStayForm({ room }) {
 
   return (
     <form className={styles.form} onSubmit={submit}>
-      <h3>Book this room</h3>
+      <h3>Book the apartment</h3>
+      <p>The whole villa for your group — not a single room.</p>
       <StayDatePicker
         checkIn={checkIn}
         checkOut={checkOut}
@@ -58,7 +59,7 @@ export default function RoomStayForm({ room }) {
         }}
       />
       <label>
-        Guests
+        Guests in the group
         <input type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} />
       </label>
       {closed && <p className={styles.notice}>{closed}</p>}

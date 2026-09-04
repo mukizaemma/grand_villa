@@ -15,11 +15,15 @@ import {
   Refrigerator,
   Cigarette,
   Coffee,
+  UtensilsCrossed,
+  Droplets,
+  Wine,
+  Ship,
 } from 'lucide-react'
 import { useRoomsPage } from '@lib/queries/useRoomsPage'
 import { FEATURE_LIBRARY } from '@features/hotel/rooms/featureLibrary'
+import { APARTMENT } from '@features/hotel/lakeStay'
 import PageLoader from '@components/ui/PageLoader'
-import RoomCard from '@components/hotel/RoomCard'
 import RichText from '@components/ui/RichText'
 import RoomGallery from '@sections/room-detail/RoomGallery'
 import RoomStayForm from '@sections/room-detail/RoomStayForm'
@@ -45,6 +49,10 @@ const FEATURE_ICONS = {
   bath: Bath,
   sofa: Sofa,
   fridge: Refrigerator,
+  kitchen: UtensilsCrossed,
+  'hot-water': Droplets,
+  'private-bar': Wine,
+  boat: Ship,
 }
 
 function specLabel(key, value) {
@@ -68,12 +76,14 @@ export default function RoomDetailPage() {
     )
   }
 
-  const room = data.rooms.find((item) => item.id === roomId)
+  const room = data.rooms.find((item) => item.id === roomId) || data.rooms[0]
   if (!room) return <Navigate to="/accommodation" replace />
 
-  const others = data.rooms.filter((item) => item.id !== room.id)
   const specs = SPEC_META.map((item) => ({ ...item, value: room.specs?.[item.key] })).filter((item) => item.value)
   const features = room.features || []
+  const night = room.pricePerNight || APARTMENT.priceSelfCatering
+  const breakfast = room.priceWithBreakfast || APARTMENT.priceWithBreakfast
+  const monthly = room.monthlyRate || APARTMENT.monthlyRate
 
   return (
     <div className={styles.page}>
@@ -81,7 +91,7 @@ export default function RoomDetailPage() {
         <nav className={styles.crumb} aria-label="Breadcrumb">
           <Link to="/">Home</Link>
           <span>/</span>
-          <Link to="/accommodation">Accommodation</Link>
+          <Link to="/accommodation">The apartment</Link>
           <span>/</span>
           <span>{room.name}</span>
         </nav>
@@ -94,10 +104,13 @@ export default function RoomDetailPage() {
               roomName={room.name}
             />
 
-            <p className={styles.kicker}>Accommodation</p>
+            <p className={styles.kicker}>The whole building</p>
             <h1>{room.name}</h1>
             <p className={styles.price}>
-              From <strong>${room.pricePerNight}</strong> / night
+              <strong>${night}</strong> / night without breakfast
+            </p>
+            <p className={styles.note}>
+              ${breakfast} / night with breakfast · ${Number(monthly).toLocaleString('en-US')} / month
             </p>
 
             {specs.length > 0 && (
@@ -134,32 +147,11 @@ export default function RoomDetailPage() {
           <Reveal className={styles.side} delay={100} as="aside">
             <RoomStayForm room={room} />
             <Link to="/accommodation" className={styles.back}>
-              ← All rooms
+              ← The apartment
             </Link>
           </Reveal>
         </div>
       </div>
-
-      {others.length > 0 && (
-        <section className={styles.related}>
-          <div className="container">
-            <Reveal className={styles.relatedHead}>
-              <div>
-                <p>Keep exploring</p>
-                <h2>Other rooms</h2>
-              </div>
-              <Link to="/accommodation">View all</Link>
-            </Reveal>
-            <div className={styles.relatedGrid}>
-              {others.slice(0, 3).map((item, index) => (
-                <Reveal key={item.id} delay={index * 80}>
-                  <RoomCard room={item} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   )
 }

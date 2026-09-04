@@ -27,6 +27,15 @@ function lexical(text) {
   }
 }
 
+function mediaId(value) {
+  if (!value) return null
+  if (typeof value === 'string') return value
+  return value.id || null
+}
+
+const APARTMENT_COPY =
+  'Grand Villa is one private apartment — the whole building — for a group staying together by Lake Kivu in Karongi. Six bedrooms and six bathrooms, a kitchen to cook in, a private bar for people staying here, hot water, and air conditioning. Guests in the apartment can take a boat ride on the lake. The villa is $150 a night without breakfast, $200 with breakfast, or $2,500 for a month. We do not rent single rooms.'
+
 if (!process.env.MONGODB_URI && !process.env.DATABASE_URI) {
   console.error('Missing MONGODB_URI')
   process.exit(1)
@@ -39,13 +48,14 @@ await payload.updateGlobal({
   overrideAccess: true,
   data: {
     name: 'Grand Villa Apartment',
-    tagline: 'A serviced apartment on Lake Kivu in Karongi',
+    tagline: 'A private apartment for your group on Lake Kivu in Karongi',
     distanceFromKigali: 'About 3 hours from Kigali',
     address: 'Karongi, Western Province, Rwanda — on the Lake Kivu shoreline',
-    seoTitle: 'Grand Villa Apartment | Lake Kivu stay in Karongi',
-    seoKeywords: 'Lake Kivu apartment, Karongi stay, Kibuye, boat riding, kayaking, hiking Rwanda',
+    seoTitle: 'Grand Villa Apartment | Private group stay on Lake Kivu, Karongi',
+    seoKeywords:
+      'Lake Kivu apartment, Karongi group stay, Kibuye villa, 6 bedroom apartment Rwanda, boat riding Karongi',
     seoDescription:
-      'Stay in a serviced apartment in Karongi, on Lake Kivu. Boat riding, kayaking, hiking, and a quiet place to come back to — about three hours from Kigali.',
+      'Take the whole Grand Villa apartment in Karongi: 6 bedrooms, 6 bathrooms, kitchen, private bar, air-con, hot water, and a boat for guests. $150/night without breakfast, $200 with breakfast, $2,500/month.',
   },
 })
 console.log('company updated')
@@ -55,19 +65,19 @@ const slides = (home.hero?.slides || []).map((slide, index) => {
   const copy = [
     {
       eyebrow: 'Karongi · Lake Kivu',
-      headline: 'Grand Villa Apartment',
+      headline: 'One villa for your whole group',
       subline:
-        'A serviced apartment on Rwanda’s favourite lakeshore — boat, kayak, hike, then come home.',
+        'Six bedrooms, a kitchen, a private bar, and a boat for guests staying here — take the building, not a hotel room.',
     },
     {
       eyebrow: 'Days on the water',
-      headline: 'Boat riding, kayaking, and the trail',
-      subline: 'Karongi is for moving: islands, quiet bays, and the hills above Kibuye.',
+      headline: 'Boat, kayak, then back to your place',
+      subline: 'The apartment is the base. Lake days are for the group staying in the villa.',
     },
   ][index] || {
     eyebrow: 'Karongi',
     headline: slide.headline,
-    subline: 'Stay by Lake Kivu.',
+    subline: 'A private apartment on Lake Kivu.',
   }
   return {
     id: slide.id,
@@ -89,74 +99,229 @@ await payload.updateGlobal({
         : [
             {
               eyebrow: 'Karongi · Lake Kivu',
-              headline: 'Grand Villa Apartment',
+              headline: 'One villa for your whole group',
               subline: lexical(
-                'A serviced apartment on Rwanda’s favourite lakeshore — boat, kayak, hike, then come home.',
+                'Six bedrooms, a kitchen, a private bar, and a boat for guests staying here — take the building, not a hotel room.',
               ),
             },
           ],
-      cta: { label: 'Book your stay', link: '/book' },
-      secondaryCta: { label: 'Explore the lake', link: '/things-to-do' },
+      cta: { label: 'Book the apartment', link: '/book' },
+      secondaryCta: { label: 'See the apartment', link: '/accommodation' },
     },
     features: [
-      { icon: 'waves', title: 'On Lake Kivu', text: 'Wake up on the Karongi shoreline — coffee, then the water in front of you.' },
-      { icon: 'ship', title: 'Boat & kayak', text: 'Ride with local captains, paddle a quiet bay, or watch the sun drop into the lake.' },
-      { icon: 'mountain', title: 'Hills & trails', text: 'Hike the Congo Nile Trail, coffee country, and lookouts above Karongi.' },
-      { icon: 'map-pin', title: 'Apartment stay', text: 'A home base with space to cook, rest, and plan the next lake day.' },
+      {
+        icon: 'wine',
+        title: 'Private bar',
+        text: 'An in-house bar for the group staying in the villa.',
+      },
+      {
+        icon: 'utensils',
+        title: 'Kitchen inside',
+        text: 'A full kitchen in the apartment, so the group can cook together.',
+      },
+      {
+        icon: 'droplets',
+        title: 'Hot water',
+        text: 'Hot water throughout the apartment after a day on the lake.',
+      },
+      {
+        icon: 'wind',
+        title: 'Air conditioning',
+        text: 'Cool rooms to come back to in the afternoon heat.',
+      },
     ],
     welcome: {
       ...(home.welcome || {}),
       eyebrow: 'Karongi · Lake Kivu',
-      headline: 'A serviced apartment on Rwanda’s favourite lake',
+      headline: 'A private apartment on Lake Kivu',
       body: lexical(
-        'Grand Villa sits in Karongi, on the western shore of Lake Kivu — one of the most visited corners of Rwanda. Sleep in a real apartment, then spend the day on the water or in the hills: boat rides, kayaking, hiking the Congo Nile Trail, and more with people who know this shoreline.',
+        'Grand Villa is one building on the Karongi shore — not a hotel of single rooms. Take the villa together, cook and gather inside, then spend the day on the water: boat, kayak, or the Congo Nile Trail, about three hours from Kigali.',
       ),
-      cta: { label: 'See things to do', path: '/things-to-do' },
+      cta: { label: 'Book the apartment', path: '/book' },
     },
     roomsSection: {
-      eyebrow: 'Stay with us',
-      headline: 'An apartment base for lake days',
-      intro: 'Come back to a quiet, serviced apartment after the boat, the trail, or a slow afternoon in Karongi.',
+      eyebrow: 'Rates',
+      headline: 'Book the villa',
+      intro:
+        '$150 a night without breakfast, $200 with breakfast, or $2,500 a month for the whole apartment.',
     },
     experiencesSection: {
-      eyebrow: 'On the water & in the hills',
-      headline: 'What to do from the apartment',
+      eyebrow: 'From the villa',
+      headline: 'Lake days, then back to your place',
       intro:
-        'Karongi is a place you move through — boat, paddle, walk — not only a room with a view. We help you set the days up.',
+        'Boat for guests staying here, kayaking, and the Congo Nile Trail. The apartment is the base — not a hotel room you leave in the morning.',
     },
     location: {
       ...(home.location || {}),
       eyebrow: 'Karongi',
       headline: 'On the western shore of Lake Kivu',
       body: lexical(
-        'Karongi (Kibuye) is where many travellers first fall for the lake: islands, fishing boats, and the Congo Nile Trail in the hills behind town. We are an apartment stay — your base between those days.',
+        'Karongi (Kibuye) is about three hours from Kigali, on the western shore of Lake Kivu. The apartment is the group’s base between boat days, trails, and evenings in the villa.',
       ),
       highlights: [
         { text: 'Karongi (Kibuye) on the western shore of Lake Kivu' },
-        { text: 'Boat rides, kayaking, and island trips from the lakeshore' },
-        { text: 'Congo Nile Trail, coffee hills, and lookouts above town' },
         { text: 'About a three-hour drive from Kigali' },
+        { text: 'Boat days and the Congo Nile Trail from the door' },
       ],
     },
     cta: {
       ...(home.cta || {}),
       eyebrow: 'Karongi · Lake Kivu',
-      headline: 'Make this your base on the lake',
+      headline: 'Bring the group. Take the villa.',
       body: lexical(
-        'Book the apartment, then add a boat ride, a kayak morning, or a hike — or just sit with the water in view.',
+        'Grand Villa is one private apartment, not a hotel of single rooms. Book the whole building, add breakfast if you want it, and take the boat when you want the lake.',
       ),
-      cta: { label: 'Book your stay', path: '/book' },
+      cta: { label: 'Book the apartment', path: '/book' },
     },
   },
 })
 console.log('home-page updated')
 
+const roomsFound = await payload.find({
+  collection: 'rooms',
+  limit: 100,
+  depth: 1,
+  overrideAccess: true,
+})
+const roomDocs = roomsFound.docs
+const galleryIds = []
+for (const doc of roomDocs) {
+  const imageId = mediaId(doc.image)
+  if (imageId && !galleryIds.includes(imageId)) galleryIds.push(imageId)
+  for (const row of doc.gallery || []) {
+    const photoId = mediaId(row.photo)
+    if (photoId && !galleryIds.includes(photoId)) galleryIds.push(photoId)
+  }
+}
+const apartmentData = {
+  name: 'Grand Villa Apartment',
+  pricePerNight: 150,
+  priceWithBreakfast: 200,
+  monthlyRate: 2500,
+  units: 1,
+  description: lexical(APARTMENT_COPY),
+  specs: {
+    size: 'One private apartment',
+    bed: '6 bedrooms',
+    occupancy: 'One group — whole villa',
+    view: 'Lake Kivu, Karongi',
+    smoking: 'No smoking',
+    breakfast: '$150 without / $200 with',
+  },
+  features: ['wifi', 'ac', 'bath', 'kitchen', 'hot-water', 'private-bar', 'boat', 'fridge'],
+  image: galleryIds[0],
+  gallery: galleryIds.map((photo) => ({ photo })),
+}
+
+const keeper =
+  roomDocs.find((doc) => /villa|apartment|grand/i.test(`${doc.name || ''} ${doc.slug || ''}`)) ||
+  roomDocs[0]
+
+if (keeper) {
+  await payload.update({
+    collection: 'rooms',
+    id: keeper.id,
+    overrideAccess: true,
+    data: apartmentData,
+  })
+  console.log('apartment listing updated', keeper.slug)
+  for (const doc of roomDocs) {
+    if (doc.id === keeper.id) continue
+    await payload.delete({ collection: 'rooms', id: doc.id, overrideAccess: true })
+    console.log('removed extra room type', doc.name)
+  }
+} else {
+  await payload.create({
+    collection: 'rooms',
+    overrideAccess: true,
+    data: apartmentData,
+  })
+  console.log('apartment listing created')
+}
+
+const roomsPage = await payload.findGlobal({ slug: 'rooms-page', depth: 0, overrideAccess: true })
+await payload.updateGlobal({
+  slug: 'rooms-page',
+  overrideAccess: true,
+  data: {
+    hero: {
+      ...(roomsPage.hero || {}),
+      eyebrow: 'The apartment',
+      headline: 'One private villa for your group',
+      intro: lexical(
+        'Six bedrooms, six bathrooms, a kitchen, and a private bar on Lake Kivu. Take the whole building — $150 a night without breakfast, $200 with breakfast, or $2,500 a month.',
+      ),
+      cta: { label: 'Book the apartment', path: '/book' },
+      secondaryCta: { label: 'Ask about a month', path: '/contact' },
+    },
+    highlights: [
+      { icon: 'bed', label: '6 bedrooms' },
+      { icon: 'bath', label: '6 bathrooms' },
+      { icon: 'kitchen', label: 'Kitchen' },
+      { icon: 'bar', label: 'Private bar' },
+      { icon: 'ac', label: 'Air conditioning' },
+      { icon: 'hot-water', label: 'Hot water' },
+      { icon: 'boat', label: 'Boat for in-house guests' },
+    ],
+  },
+})
+console.log('rooms-page updated')
+
+const bar = await payload.findGlobal({ slug: 'bar-restaurant-page', depth: 0, overrideAccess: true })
+await payload.updateGlobal({
+  slug: 'bar-restaurant-page',
+  overrideAccess: true,
+  data: {
+    hero: {
+      ...(bar.hero || {}),
+      eyebrow: 'In-house',
+      headline: 'Kitchen and a private bar',
+      intro: lexical(
+        'Cook in the apartment kitchen. The bar is for your group staying in the villa — not a public hotel restaurant. Breakfast is $200 a night for the apartment, or $150 without.',
+      ),
+      cta: { label: 'Book the apartment', path: '/book' },
+    },
+    homeSpotlight: {
+      ...(bar.homeSpotlight || {}),
+      eyebrow: 'In-house',
+      headline: 'Kitchen and a private bar',
+      intro:
+        'Cook in the apartment kitchen. The bar is for your group staying in the villa — not a public hotel restaurant.',
+      features: [
+        { icon: 'food', title: 'Full kitchen', text: 'Cook together — the apartment has a kitchen for your group.' },
+        { icon: 'drinks', title: 'Private bar', text: 'The bar is for people staying in the villa, not walk-in guests.' },
+        { icon: 'coffee', title: 'Breakfast optional', text: '$150 a night without breakfast, $200 with breakfast.' },
+      ],
+      cta: { label: 'Kitchen & bar', path: '/bar-restaurant' },
+    },
+  },
+})
+console.log('bar-restaurant-page updated')
+
+const about = await payload.findGlobal({ slug: 'about-page', depth: 0, overrideAccess: true })
+await payload.updateGlobal({
+  slug: 'about-page',
+  overrideAccess: true,
+  data: {
+    hero: {
+      ...(about.hero || {}),
+      eyebrow: 'About us',
+      headline: 'A home by Lake Kivu',
+      intro: lexical(
+        'Grand Villa is one private apartment in Karongi for a group — six bedrooms, a kitchen, a private bar, and the lake outside. We host groups who take the whole villa.',
+      ),
+    },
+  },
+})
+console.log('about-page updated')
+
 const activities = [
   {
     slug: 'evening-walk',
     name: 'Boat riding',
-    price: 40,
-    description: 'Cross the bays of Lake Kivu with a local skipper — islands, fishing villages, and long views west.',
+    price: 0,
+    description:
+      'For guests staying in the apartment: a boat ride on Lake Kivu — bays, islands, and the western shore.',
   },
   {
     slug: 'morning-run',
@@ -195,21 +360,18 @@ const hiking = await payload.find({
   limit: 1,
   overrideAccess: true,
 })
-if (!hiking.docs[0]) {
-  await payload.create({
+if (hiking.docs[0]) {
+  await payload.update({
     collection: 'experiences',
+    id: hiking.docs[0].id,
     overrideAccess: true,
     data: {
       name: 'Hiking',
-      price: 20,
       description: lexical(
         'Walk the Congo Nile Trail and the hills above Karongi — tea, coffee, and the lake below you.',
       ),
     },
   })
-  console.log('created Hiking')
-} else {
-  console.log('hiking already exists')
 }
 
 const things = await payload.findGlobal({ slug: 'things-to-do-page', depth: 0, overrideAccess: true })
@@ -219,12 +381,12 @@ await payload.updateGlobal({
   data: {
     hero: {
       ...(things.hero || {}),
-      eyebrow: 'Around Grand Villa',
+      eyebrow: 'From the villa',
       headline: 'Days on Lake Kivu',
       intro: lexical(
-        'Boat riding, kayaking, hiking the Congo Nile Trail — then back to the apartment in Karongi. Add an experience to your stay, or ask the desk to set the day up.',
+        'Boat riding for guests staying in the apartment, kayaking, hiking the Congo Nile Trail — then back to your villa in Karongi.',
       ),
-      cta: { label: 'Book your stay', path: '/book' },
+      cta: { label: 'Book the apartment', path: '/book' },
       secondaryCta: { label: 'Ask the desk', path: '/contact' },
     },
   },

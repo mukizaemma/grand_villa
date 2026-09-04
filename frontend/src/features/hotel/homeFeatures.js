@@ -1,4 +1,4 @@
-import { Coffee, Wifi, MapPin, BedDouble, ParkingCircle, UtensilsCrossed, Waves, Bell, Ship, Mountain, Trees, Sunrise } from 'lucide-react'
+import { Coffee, Wifi, MapPin, BedDouble, ParkingCircle, UtensilsCrossed, Waves, Bell, Ship, Mountain, Trees, Sunrise, Users, Wine, Droplets, Wind, Snowflake } from 'lucide-react'
 import { DEFAULT_HOME_FEATURES as LAKE_FEATURES } from './lakeStay'
 
 export const FEATURE_ICONS = {
@@ -14,6 +14,13 @@ export const FEATURE_ICONS = {
   mountain: Mountain,
   trees: Trees,
   sunrise: Sunrise,
+  users: Users,
+  wine: Wine,
+  bar: Wine,
+  droplets: Droplets,
+  'hot-water': Droplets,
+  wind: Wind,
+  ac: Snowflake,
 }
 
 export const DEFAULT_HOME_FEATURES = LAKE_FEATURES

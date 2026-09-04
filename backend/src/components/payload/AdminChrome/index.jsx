@@ -37,12 +37,36 @@ function placeLoginChrome() {
   }
 }
 
+function applyCompanyFavicon(url) {
+  if (!url) return
+  let link = document.querySelector('link[rel="icon"]')
+  if (!link) {
+    link = document.createElement('link')
+    link.setAttribute('rel', 'icon')
+    document.head.appendChild(link)
+  }
+  if (link.getAttribute('href') === url) return
+  link.setAttribute('href', url)
+}
+
+function loadCompanyFavicon() {
+  fetch('/api/globals/company?depth=1', { credentials: 'include' })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((company) => {
+      const file = company?.logo
+      const url = typeof file === 'string' ? file : file?.url || file?.thumbnailURL
+      applyCompanyFavicon(url)
+    })
+    .catch(() => {})
+}
+
 function removeExtraSave() {
   document.querySelectorAll('.ireme-form-save').forEach((node) => node.remove())
 }
 
 export function AdminChrome({ children }) {
   useEffect(() => {
+    loadCompanyFavicon()
     const id = window.setInterval(() => {
       removeExtraSave()
       placeLoginChrome()

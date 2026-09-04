@@ -15,6 +15,7 @@ function adaptMedia(doc) {
     caption: doc.alt || doc.filename || '',
     aspect: 'square',
     image: mediaUrl(doc),
+    createdAt: doc.createdAt,
   }
 }
 

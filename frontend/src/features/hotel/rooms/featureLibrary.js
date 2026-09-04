@@ -8,4 +8,8 @@ export const FEATURE_LIBRARY = {
   bath: 'Private Bathroom',
   sofa: 'Sitting Area',
   fridge: 'Mini Fridge',
+  kitchen: 'Full kitchen',
+  'hot-water': 'Hot water',
+  'private-bar': 'Private in-house bar',
+  boat: 'Boat ride for in-house guests',
 }

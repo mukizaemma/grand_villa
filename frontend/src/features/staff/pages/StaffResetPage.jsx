@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { BRAND } from '@features/hotel/brand'
+import { brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
 import styles from './StaffLoginPage.module.css'
 
 export default function StaffResetPage() {
   const { token } = useParams()
   const { resetPassword } = useStaffAuth()
+  const { data } = useSiteLayout()
+  const brand = brandFromCompany(data?.company)
   const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -41,7 +44,7 @@ export default function StaffResetPage() {
         ← Back to home
       </Link>
       <form className={styles.card} onSubmit={onSubmit}>
-        <img className={styles.logo} src={BRAND.logo} alt={BRAND.name} />
+        {brand.logo ? <img className={styles.logo} src={brand.logo} alt={brand.name} /> : null}
         <h1>New password</h1>
         <p>Choose a new password for your admin account.</p>
         <label>

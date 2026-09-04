@@ -1,32 +1,11 @@
 import { useHomePage } from '@lib/queries/useHomePage'
-import CardGrid from '@components/ui/CardGrid'
-import RoomCard from '@components/hotel/RoomCard'
-import Reveal from '@components/ui/Reveal'
-import styles from './HomeRooms.module.css'
+import { pickApartment } from '@features/hotel/adapters'
+import ApartmentStay from '@sections/stay/ApartmentStay'
 
 export default function HomeRooms() {
   const { data } = useHomePage()
-  const rooms = data.rooms
-  if (!rooms.length) return null
-
+  const apartment = pickApartment(data.rooms)
   const section = data.roomsSection || {}
 
-  return (
-    <section className={styles.section}>
-      <div className={`container ${styles.wide}`}>
-        <Reveal className={styles.header}>
-          {section.eyebrow && <span className={styles.eyebrow}>{section.eyebrow}</span>}
-          <h2>{section.headline}</h2>
-          {section.intro && <p className={styles.intro}>{section.intro}</p>}
-        </Reveal>
-        <CardGrid
-          items={rooms}
-          initialCount={3}
-          moreTo="/accommodation"
-          moreLabel="View all rooms"
-          renderCard={(room) => <RoomCard key={room.id} room={room} variant="showcase" />}
-        />
-      </div>
-    </section>
-  )
+  return <ApartmentStay apartment={apartment} section={section} compact />
 }

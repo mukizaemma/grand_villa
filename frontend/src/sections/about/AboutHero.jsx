@@ -10,11 +10,11 @@ export default function AboutHero() {
       image={backgroundImage}
       eyebrow={eyebrow || 'About us'}
       title={headline || 'A home by Lake Kivu'}
-      text={intro || 'Grand Villa Apartment is a comfortable stay in Karongi — rooms, dining, and the lake just outside.'}
+      text={intro || 'Grand Villa is one private apartment in Karongi for a group — six bedrooms, a kitchen, a private bar, and the lake outside.'}
       primaryTo="/book"
-      primaryLabel="Book now"
+      primaryLabel="Book the apartment"
       secondaryTo="/accommodation"
-      secondaryLabel="See rooms"
+      secondaryLabel="See the apartment"
     />
   )
 }

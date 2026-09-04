@@ -172,7 +172,8 @@ export default function StaffGallery() {
     <div className="staffPage">
       <h1>Website gallery</h1>
       <p className="staffLead">
-        Upload several photos at once, or pick from the library. Files over 700KB are resized first.
+        Upload photos of the apartment. New files are tagged The apartment and appear on the
+        homepage (latest 4) and the full Gallery page. Files over 700KB are resized first.
       </p>
       <div className="staffToolbar">
         <label className="staffBtn">

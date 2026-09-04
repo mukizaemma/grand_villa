@@ -184,11 +184,11 @@ export default function HomeHero() {
               <h1 className={styles.slideTitle}>{slide.headline || 'Grand Villa Apartment'}</h1>
               <p className={styles.slideDescription}>
                 {slide.subline ||
-                  'A serviced apartment on the Karongi shoreline — boat rides, kayaking, hiking, then a quiet place to come back to.'}
+                  'A private apartment for your group on the Karongi shoreline — six bedrooms, a kitchen, a private bar, and a boat for days on the lake.'}
               </p>
               <div className={styles.slideActions}>
                 <Link to={primaryCta.link || '/book'} className={styles.primaryBtn}>
-                  {primaryCta.label || 'Book your stay'}
+                  {primaryCta.label || 'Book the apartment'}
                 </Link>
                 <Link to={secondaryCta.link || '/things-to-do'} className={styles.secondaryBtn}>
                   {secondaryCta.label || 'Explore the lake'}

@@ -21,15 +21,25 @@
   padding: 0 0.4rem;
 }
 
-.mark {
+.mark,
+.logo {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border: 1px solid #c4a574;
+  flex-shrink: 0;
+}
+
+.mark {
   display: grid;
   place-items: center;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.logo {
+  object-fit: contain;
+  background: #fff;
 }
 
 .brand strong {

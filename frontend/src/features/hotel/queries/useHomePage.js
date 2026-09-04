@@ -17,6 +17,47 @@ import {
   ROOMS_SECTION,
 } from '../lakeStay'
 
+const LEGACY_WELCOME_HEADLINE = 'A private apartment for your whole group'
+const LEGACY_ROOMS_HEADLINE = 'One villa. Your whole group.'
+const LEGACY_FEATURE_TITLES = new Set([
+  'The whole villa',
+  'Kitchen & private bar',
+  'Boat for your stay',
+  'Air-con and hot water',
+])
+
+function preferFresh(value, stale, fresh) {
+  if (!value || value === stale) return fresh
+  return value
+}
+
+function adaptFeatures(rows) {
+  const features = (rows || [])
+    .map((item) => ({
+      id: item.id,
+      icon: item.icon,
+      title: item.title,
+      text: item.text,
+    }))
+    .filter((item) => item.title)
+  const looksLegacy =
+    features.length > 0 && features.every((item) => LEGACY_FEATURE_TITLES.has(item.title))
+  return looksLegacy || !features.length ? DEFAULT_HOME_FEATURES : features
+}
+
+function welcomeBody(raw) {
+  const text = asPlain(raw)
+  if (!text) return DESTINATION.body
+  if (/six bedrooms, six bathrooms, a kitchen, and a private bar/i.test(text)) return DESTINATION.body
+  return text
+}
+
+function adaptHighlights(rows) {
+  const highlights = (rows || []).map((item) => item.text).filter(Boolean)
+  const repeatsVilla = highlights.some((text) => /six bedrooms|in-house bar/i.test(text))
+  return repeatsVilla || !highlights.length ? LOCATION_HIGHLIGHTS : highlights
+}
+
 async function fetchHomePage() {
   const [pageRes, roomsRes] = await Promise.all([
     apiClient.get('/api/globals/home-page?depth=2'),
@@ -25,14 +66,6 @@ async function fetchHomePage() {
 
   const page = pageRes.data
   const rooms = roomsRes.data.docs.map(adaptRoom)
-  const features = (page.features || [])
-    .map((item) => ({
-      id: item.id,
-      icon: item.icon,
-      title: item.title,
-      text: item.text,
-    }))
-    .filter((item) => item.title)
 
   return {
     hero: {
@@ -44,7 +77,7 @@ async function fetchHomePage() {
         image: mediaUrl(slide.image),
       })),
       cta: {
-        label: page.hero?.cta?.label || 'Book your stay',
+        label: page.hero?.cta?.label || 'Book the apartment',
         link: page.hero?.cta?.link || '/book',
       },
       secondaryCta: {
@@ -53,15 +86,15 @@ async function fetchHomePage() {
       },
     },
 
-    features: features.length ? features : DEFAULT_HOME_FEATURES,
+    features: adaptFeatures(page.features),
 
     destination: {
       eyebrow: page.welcome?.eyebrow || DESTINATION.eyebrow,
-      headline: page.welcome?.headline || DESTINATION.headline,
-      body: asPlain(page.welcome?.body) || DESTINATION.body,
+      headline: preferFresh(page.welcome?.headline, LEGACY_WELCOME_HEADLINE, DESTINATION.headline),
+      body: welcomeBody(page.welcome?.body),
       cta: {
-        label: page.welcome?.cta?.label || DESTINATION.cta.label,
-        path: page.welcome?.cta?.path || DESTINATION.cta.path,
+        label: page.welcome?.cta?.label === 'See the apartment' ? DESTINATION.cta.label : page.welcome?.cta?.label || DESTINATION.cta.label,
+        path: page.welcome?.cta?.path === '/accommodation' ? DESTINATION.cta.path : page.welcome?.cta?.path || DESTINATION.cta.path,
       },
       images: {
         primary: mediaUrl(page.welcome?.primaryImage),
@@ -89,9 +122,13 @@ async function fetchHomePage() {
     },
 
     roomsSection: {
-      eyebrow: page.roomsSection?.eyebrow || ROOMS_SECTION.eyebrow,
-      headline: page.roomsSection?.headline || ROOMS_SECTION.headline,
-      intro: page.roomsSection?.intro || ROOMS_SECTION.intro,
+      eyebrow: preferFresh(page.roomsSection?.eyebrow, 'The apartment', ROOMS_SECTION.eyebrow),
+      headline: preferFresh(page.roomsSection?.headline, LEGACY_ROOMS_HEADLINE, ROOMS_SECTION.headline),
+      intro: preferFresh(
+        page.roomsSection?.intro,
+        'Six bedrooms, six bathrooms, a kitchen, a private bar, air conditioning, and hot water. Take the building for the lake — $150 a night without breakfast, $200 with breakfast, or $2,500 a month.',
+        ROOMS_SECTION.intro,
+      ),
     },
 
     experiencesSection: {
@@ -123,9 +160,7 @@ async function fetchHomePage() {
       eyebrow: page.location?.eyebrow || 'Karongi',
       headline: page.location?.headline || 'On the western shore of Lake Kivu',
       body: asPlain(page.location?.body),
-      highlights: (page.location?.highlights || [])
-        .map((item) => item.text)
-        .filter(Boolean),
+      highlights: adaptHighlights(page.location?.highlights),
       highlightFallback: LOCATION_HIGHLIGHTS,
       cta: {
         label: page.location?.cta?.label || 'Get directions',

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { MapPin, Clock, Phone, Mail, Navigation } from 'lucide-react';
 import { useSiteLayout } from '@lib/queries/useSiteLayout';
 import { BRAND, PUBLIC_NAV } from '@features/hotel/brand';
+import { brandFromCompany } from '@features/hotel/companyBrand';
 import { normalizeSocials, visibleSocials } from '@features/hotel/socials';
 import { SOCIAL_ICONS } from '@features/hotel/socialIcons';
 import styles from './Footer.module.css';
@@ -10,6 +11,7 @@ export default function Footer() {
   const { data } = useSiteLayout();
   const primaryNav = PUBLIC_NAV;
   const company = data.company;
+  const brand = brandFromCompany(company);
   const socials = visibleSocials(normalizeSocials(company.socials));
 
   return (
@@ -17,10 +19,14 @@ export default function Footer() {
       <div className={`container ${styles.grid}`}>
         <div className={styles.brandCol}>
           <NavLink to="/" className={styles.logo}>
-            <img src={BRAND.logo} alt={BRAND.name} style={{ height: 52, width: 'auto' }} />
-            <span>{BRAND.name}</span>
+            {brand.logo ? (
+              <img src={brand.logo} alt="" />
+            ) : (
+              <span className={styles.mark}>{brand.initials}</span>
+            )}
+            <span>{brand.name}</span>
           </NavLink>
-          <p className={styles.tagline}>{company.tagline || BRAND.tagline}</p>
+          <p className={styles.tagline}>{brand.tagline}</p>
 
           {socials.length > 0 && (
             <div className={styles.socials}>

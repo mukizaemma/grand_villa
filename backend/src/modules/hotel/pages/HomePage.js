@@ -6,12 +6,16 @@ const FEATURE_ICONS = [
   { label: 'Location', value: 'map-pin' },
   { label: 'Rooms / bed', value: 'bed' },
   { label: 'Parking', value: 'parking' },
-  { label: 'Restaurant', value: 'utensils' },
+  { label: 'Kitchen', value: 'utensils' },
+  { label: 'Private bar', value: 'wine' },
+  { label: 'Hot water', value: 'droplets' },
+  { label: 'Air conditioning', value: 'wind' },
   { label: 'Lake / water', value: 'waves' },
   { label: 'Boat', value: 'ship' },
   { label: 'Hiking / hills', value: 'mountain' },
   { label: 'Nature', value: 'trees' },
   { label: 'Sunrise', value: 'sunrise' },
+  { label: 'Group / people', value: 'users' },
   { label: 'Concierge', value: 'bell' },
 ]
 
@@ -70,7 +74,7 @@ export const HomePage = {
                   label: 'Primary button',
                   admin: { width: '50%', className: 'hero-cta-card' },
                   fields: [
-                    { name: 'label', type: 'text', defaultValue: 'Book your stay', admin: { width: '50%' } },
+                    { name: 'label', type: 'text', defaultValue: 'Book the apartment', admin: { width: '50%' } },
                     { name: 'link', type: 'text', defaultValue: '/book', admin: { width: '50%' } },
                   ],
                 },
@@ -90,7 +94,7 @@ export const HomePage = {
         },
         {
           label: 'Features',
-          description: 'Four short highlights directly under the destination story — lake, boat, trail, apartment.',
+          description: 'Four short amenity highlights under the destination story — kitchen, bar, hot water, air-con.',
           fields: [
             {
               name: 'features',
@@ -119,7 +123,7 @@ export const HomePage = {
           fields: [
             unnamedGroup('welcome', [
               { name: 'eyebrow', type: 'text', defaultValue: 'Karongi · Lake Kivu' },
-              { name: 'headline', type: 'text', defaultValue: 'A serviced apartment on Rwanda’s favourite lake' },
+              { name: 'headline', type: 'text', defaultValue: 'A private apartment on Lake Kivu' },
               { name: 'body', type: 'richText' },
               {
                 name: 'cta',
@@ -146,21 +150,22 @@ export const HomePage = {
           ],
         },
         {
-          label: 'Rooms',
-          description: 'Heading only. Individual rooms are edited under Rooms.',
+          label: 'The apartment',
+          description: 'Heading for the home-page villa block. The listing itself is edited under Apartment.',
           fields: [
             unnamedGroup('roomsSection', [
-              { name: 'eyebrow', type: 'text', defaultValue: 'Stay with us', admin: { width: '25%' } },
+              { name: 'eyebrow', type: 'text', defaultValue: 'The apartment', admin: { width: '25%' } },
               {
                 name: 'headline',
                 type: 'text',
-                defaultValue: 'An apartment base for lake days',
+                defaultValue: 'Book the villa',
                 admin: { width: '75%' },
               },
               {
                 name: 'intro',
                 type: 'textarea',
-                defaultValue: 'Come back to a quiet, serviced apartment after the boat, the trail, or a slow afternoon in Karongi.',
+                defaultValue:
+                  '$150 a night without breakfast, $200 with breakfast, or $2,500 a month for the whole apartment.',
                 admin: { width: '100%' },
               },
             ]),
@@ -175,14 +180,14 @@ export const HomePage = {
               {
                 name: 'headline',
                 type: 'text',
-                defaultValue: 'What to do from the apartment',
+                defaultValue: 'Lake days, then back to your place',
                 admin: { width: '75%' },
               },
               {
                 name: 'intro',
                 type: 'textarea',
                 defaultValue:
-                  'Karongi is a place you move through — boat, paddle, walk — not only a room with a view. We help you set the days up.',
+                  'Boat for guests staying here, kayaking, and the Congo Nile Trail. The apartment is the base — not a hotel room you leave in the morning.',
                 admin: { width: '100%' },
               },
             ]),

@@ -19,19 +19,23 @@ const FEATURE_ICON_OPTIONS = [
   { value: 'map-pin', label: 'Location' },
   { value: 'bed', label: 'Rooms / bed' },
   { value: 'parking', label: 'Parking' },
-  { value: 'utensils', label: 'Restaurant' },
+  { value: 'utensils', label: 'Kitchen' },
+  { value: 'wine', label: 'Private bar' },
+  { value: 'droplets', label: 'Hot water' },
+  { value: 'wind', label: 'Air conditioning' },
   { value: 'waves', label: 'Lake / water' },
   { value: 'ship', label: 'Boat' },
   { value: 'mountain', label: 'Hiking / hills' },
   { value: 'trees', label: 'Nature' },
   { value: 'sunrise', label: 'Sunrise' },
+  { value: 'users', label: 'Group / people' },
   { value: 'bell', label: 'Concierge' },
 ]
 
 const PAGES = [
   { slug: 'about-page', label: 'About', path: '/about' },
-  { slug: 'rooms-page', label: 'Accommodation', path: '/accommodation' },
-  { slug: 'bar-restaurant-page', label: 'Bar & Restaurant', path: '/bar-restaurant' },
+  { slug: 'rooms-page', label: 'The apartment', path: '/accommodation' },
+  { slug: 'bar-restaurant-page', label: 'Kitchen & bar', path: '/bar-restaurant' },
   { slug: 'things-to-do-page', label: 'Things to do', path: '/things-to-do' },
   { slug: 'gallery-page', label: 'Gallery', path: '/gallery' },
   { slug: 'contact-page', label: 'Contact us', path: '/contact' },
@@ -122,7 +126,7 @@ function readPage(slug, page) {
       .filter(Boolean)
     return {
       slides: slides.length ? slides : [emptySlide()],
-      cta: { label: page.hero?.cta?.label || 'Book your stay', link: page.hero?.cta?.link || '/book' },
+      cta: { label: page.hero?.cta?.label || 'Book the apartment', link: page.hero?.cta?.link || '/book' },
       secondaryCta: {
         label: page.hero?.secondaryCta?.label || 'Explore the lake',
         link: page.hero?.secondaryCta?.link || '/things-to-do',
@@ -632,8 +636,8 @@ export default function StaffPages() {
                 </label>
 
                 <div className="full">
-                  <strong>Rooms heading</strong>
-                  <p className="staffLead">Individual rooms are edited under Rooms.</p>
+                  <strong>Apartment heading</strong>
+                  <p className="staffLead">The villa listing is edited under The apartment.</p>
                 </div>
                 <label className="staffField col-3">
                   Eyebrow

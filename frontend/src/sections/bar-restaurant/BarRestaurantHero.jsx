@@ -8,13 +8,13 @@ export default function BarRestaurantHero() {
   return (
     <PageHero
       image={backgroundImage}
-      eyebrow={eyebrow || 'Dining'}
-      title={headline || 'Restaurant & bar'}
-      text={intro || 'Unhurried plates and a glass after a day by the lake.'}
-      primaryTo={cta?.path || '/contact'}
-      primaryLabel={cta?.label || 'Reserve a table'}
-      secondaryTo="/book"
-      secondaryLabel="Book a stay"
+      eyebrow={eyebrow || 'In-house'}
+      title={headline || 'Kitchen and a private bar'}
+      text={intro || 'Cook in the apartment kitchen. The bar is for your group staying in the villa — not a public hotel restaurant.'}
+      primaryTo={cta?.path || '/book'}
+      primaryLabel={cta?.label || 'Book the apartment'}
+      secondaryTo="/contact"
+      secondaryLabel="Ask about breakfast"
     />
   )
 }

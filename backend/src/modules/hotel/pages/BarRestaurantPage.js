@@ -8,7 +8,7 @@ import {
 
 export const BarRestaurantPage = {
   slug: 'bar-restaurant-page',
-  label: 'Restaurant page',
+  label: 'Kitchen & bar',
   admin: { group: false },
   access: {
     read: () => true,
@@ -48,17 +48,18 @@ export const BarRestaurantPage = {
             description: 'Headline, highlights, and photos shown on the public home page.',
           },
           fields: [
-            { name: 'eyebrow', type: 'text', defaultValue: 'Restaurant', admin: { width: '25%' } },
+            { name: 'eyebrow', type: 'text', defaultValue: 'In-house', admin: { width: '25%' } },
             {
               name: 'headline',
               type: 'text',
-              defaultValue: 'Taste, sip & relax',
+              defaultValue: 'Kitchen and a private bar',
               admin: { width: '75%', className: 'hero-headline' },
             },
             {
               name: 'intro',
               type: 'textarea',
-              defaultValue: 'Savor delicious food, drinks, and coffee.',
+              defaultValue:
+                'Cook in the apartment kitchen. The bar is for your group staying in the villa — not a public hotel restaurant.',
               admin: { width: '100%' },
             },
             {
@@ -73,9 +74,9 @@ export const BarRestaurantPage = {
                   defaultValue: 'food',
                   admin: { width: '25%' },
                   options: [
-                    { label: 'Food', value: 'food' },
-                    { label: 'Drinks', value: 'drinks' },
-                    { label: 'Coffee', value: 'coffee' },
+                    { label: 'Kitchen', value: 'food' },
+                    { label: 'Private bar', value: 'drinks' },
+                    { label: 'Breakfast', value: 'coffee' },
                   ],
                 },
                 { name: 'title', type: 'text', required: true, admin: { width: '75%' } },
@@ -101,7 +102,7 @@ export const BarRestaurantPage = {
               label: 'Button',
               admin: { width: '50%', className: 'hero-cta-card' },
               fields: [
-                { name: 'label', type: 'text', defaultValue: 'View menu', admin: { width: '50%' } },
+                { name: 'label', type: 'text', defaultValue: 'Kitchen & bar', admin: { width: '50%' } },
                 { name: 'path', type: 'text', defaultValue: '/bar-restaurant', admin: { width: '50%' } },
               ],
             },

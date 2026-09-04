@@ -7,7 +7,7 @@ export const RESTAURANT_FEATURE_ICONS = {
 }
 
 export const DEFAULT_RESTAURANT_FEATURES = [
-  { icon: 'food', title: 'Delicious food', text: 'Fresh local & international dishes.' },
-  { icon: 'drinks', title: 'Refreshing drinks', text: 'Cocktails, wine & more.' },
-  { icon: 'coffee', title: 'Gourmet coffee', text: 'Specialty coffee & pastries.' },
+  { icon: 'food', title: 'Full kitchen', text: 'Cook together — the apartment has a kitchen for your group.' },
+  { icon: 'drinks', title: 'Private bar', text: 'The bar is for people staying in the villa, not walk-in hotel guests.' },
+  { icon: 'coffee', title: 'Breakfast optional', text: '$150 a night without breakfast, $200 with breakfast for the whole apartment.' },
 ]

@@ -65,12 +65,13 @@ export const Media = {
       defaultValue: 'none',
       admin: {
         width: '25%',
-        description: 'Choose None to keep this file in the library only. Any other value publishes it on the Gallery page.',
+        description:
+          'Choose None to keep this file in the library only. The apartment category appears on the homepage (latest 4 photos) and on the Gallery page.',
       },
       options: [
         { label: 'None — do not show on gallery', value: 'none' },
-        { label: 'Rooms', value: 'rooms' },
-        { label: 'Bar & Restaurant', value: 'bar-restaurant' },
+        { label: 'The apartment', value: 'rooms' },
+        { label: 'Kitchen & bar', value: 'bar-restaurant' },
         { label: 'Property & views', value: 'lake-grounds' },
         { label: 'Amenities', value: 'amenities' },
       ],

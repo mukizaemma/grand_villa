@@ -20,7 +20,8 @@ import {
   BookOpen,
   User,
 } from 'lucide-react'
-import { BRAND } from '@features/hotel/brand'
+import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
 import styles from './StaffLayout.module.css'
 
@@ -28,10 +29,10 @@ const NAV = [
   { to: '/staff/settings', label: 'Site setting', icon: Settings },
   { to: '/staff/pages?open=home-page', label: 'Home Page', icon: Home },
   { to: '/staff/pages', label: 'Pages', icon: FileText, end: true },
-  { to: '/staff/accommodation', label: 'Rooms', icon: BedDouble },
+  { to: '/staff/accommodation', label: 'The apartment', icon: BedDouble },
   { to: '/staff/reservations', label: 'Bookings', icon: CalendarCheck },
   { to: '/staff/availability', label: 'Availability', icon: CalendarOff },
-  { to: '/staff/pages?open=bar-restaurant-page', label: 'Restaurant page', icon: Coffee },
+  { to: '/staff/pages?open=bar-restaurant-page', label: 'Kitchen & bar', icon: Coffee },
   { to: '/staff/menu', label: 'Menu items', icon: UtensilsCrossed },
   { to: '/staff/things-to-do', label: 'Things to do', icon: Sparkles },
   { to: '/staff/amenities', label: 'Amenities', icon: Bell },
@@ -46,11 +47,14 @@ export default function StaffLayout() {
   const { user, ready, logout } = useStaffAuth()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const { data } = useSiteLayout()
+  const brand = brandFromCompany(data?.company)
 
   useEffect(() => {
-    document.title = `${BRAND.shortName} — Staff`
+    document.title = `${brand.shortName} — Staff`
+    applyCompanyFavicon(brand.logo)
     if (ready && !user) navigate('/staff/login', { replace: true })
-  }, [ready, user, navigate])
+  }, [brand.logo, brand.shortName, ready, user, navigate])
 
   if (!ready || !user) return null
 
@@ -60,9 +64,13 @@ export default function StaffLayout() {
     <div className={styles.shell}>
       <aside className={`${styles.sidebar} ${open ? styles.open : ''}`}>
         <div className={styles.brand}>
-          <span className={styles.mark}>{BRAND.mark}</span>
+          {brand.logo ? (
+            <img className={styles.logo} src={brand.logo} alt="" />
+          ) : (
+            <span className={styles.mark}>{brand.initials}</span>
+          )}
           <div>
-            <strong>{BRAND.shortName}</strong>
+            <strong>{brand.shortName}</strong>
             <small>Staff desk</small>
           </div>
         </div>

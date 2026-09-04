@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 import { staffClient, mediaId } from '../api/staffClient'
 import MediaField from '../components/MediaField'
 import { SOCIAL_PLATFORMS, emptySocials, normalizeSocials } from '@features/hotel/socials'
@@ -24,6 +25,7 @@ const empty = {
 }
 
 export default function StaffSettings() {
+  const queryClient = useQueryClient()
   const [form, setForm] = useState(empty)
   const [loaded, setLoaded] = useState(false)
 
@@ -50,6 +52,7 @@ export default function StaffSettings() {
         socials: normalizeSocials(form.socials),
       })
       toast.success('Site settings saved.')
+      queryClient.invalidateQueries({ queryKey: ['site-layout'] })
     } catch (err) {
       toast.error(err.response?.data?.errors?.[0]?.message || 'Could not save settings.')
     }

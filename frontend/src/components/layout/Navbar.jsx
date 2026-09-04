@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { useScrolled } from '@hooks/useScrolled'
-import { BRAND, PUBLIC_CTA, PUBLIC_NAV } from '@features/hotel/brand'
+import { PUBLIC_CTA, PUBLIC_NAV } from '@features/hotel/brand'
+import { brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import MobileDrawer from './MobileDrawer'
 import styles from './Navbar.module.css'
 
@@ -10,16 +12,22 @@ export default function Navbar({ hasHero = false }) {
   const scrolled = useScrolled(60)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const isTransparent = hasHero && !scrolled
+  const { data } = useSiteLayout()
+  const brand = brandFromCompany(data?.company)
 
   return (
     <>
       <header className={`${styles.navbar} ${isTransparent ? styles.transparent : styles.solid}`}>
         <div className={`container ${styles.inner}`}>
           <NavLink to="/" className={styles.brand}>
-            <img src={BRAND.logo} alt={BRAND.name} className={styles.logoImg} />
+            {brand.logo ? (
+              <img src={brand.logo} alt={brand.name} className={styles.logoImg} />
+            ) : (
+              <span className={styles.mark}>{brand.initials}</span>
+            )}
             <span className={styles.wordmark}>
-              <strong>{BRAND.shortName}</strong>
-              <small>Apartment</small>
+              <strong>{brand.shortName}</strong>
+              {/apartment/i.test(brand.name) ? <small>Apartment</small> : null}
             </span>
           </NavLink>
 

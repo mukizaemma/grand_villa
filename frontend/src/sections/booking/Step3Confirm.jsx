@@ -55,7 +55,9 @@ export default function Step3Confirm() {
   const { stay, nights, guest, details, setDetails, reset } = useBooking();
   const { data: layout } = useSiteLayout();
   const company = layout?.company;
-  const total = calcEstimatedTotal(rooms, nights, experiences);
+  const total = calcEstimatedTotal(rooms, nights, experiences, {
+    includeBreakfast: stay.includeBreakfast,
+  });
   const guestName = `${guest.firstName} ${guest.lastName}`.trim() || '—';
 
   // Path 1: "pay at hotel" — create + receipt in one call, unchanged
@@ -234,7 +236,8 @@ export default function Step3Confirm() {
         <div className={styles.reviewRow}>
           <dt>Items</dt>
           <dd>
-            {rooms.length} room(s), {experiences.length} experience(s)
+            The apartment{stay.includeBreakfast ? ' with breakfast' : ' without breakfast'}
+            {experiences.length ? `, ${experiences.length} experience(s)` : ''}
           </dd>
         </div>
         <div className={styles.reviewRow}>

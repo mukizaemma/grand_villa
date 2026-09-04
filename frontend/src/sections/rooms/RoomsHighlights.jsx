@@ -1,9 +1,21 @@
-import { Sparkles, Wifi, Coffee } from 'lucide-react'
+import { Sparkles, Wifi, Coffee, BedDouble, Bath, UtensilsCrossed, Wine, Snowflake, Droplets, Ship } from 'lucide-react'
 import { useRoomsPage } from '@lib/queries/useRoomsPage'
 import Reveal from '@components/ui/Reveal'
 import styles from './RoomsHighlights.module.css'
 
-const ICONS = { sparkles: Sparkles, wifi: Wifi, coffee: Coffee }
+const ICONS = {
+  sparkles: Sparkles,
+  wifi: Wifi,
+  coffee: Coffee,
+  breakfast: Coffee,
+  bed: BedDouble,
+  bath: Bath,
+  kitchen: UtensilsCrossed,
+  bar: Wine,
+  ac: Snowflake,
+  'hot-water': Droplets,
+  boat: Ship,
+}
 
 export default function RoomsHighlights() {
   const { data } = useRoomsPage()

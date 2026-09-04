@@ -21,8 +21,8 @@ export const GalleryPhotos = {
       admin: { width: '25%' },
       options: [
         { label: 'None — do not show', value: 'none' },
-        { label: 'Rooms', value: 'rooms' },
-        { label: 'Bar & Restaurant', value: 'bar-restaurant' },
+        { label: 'The apartment', value: 'rooms' },
+        { label: 'Kitchen & bar', value: 'bar-restaurant' },
         { label: 'Property & views', value: 'lake-grounds' },
         { label: 'Amenities', value: 'amenities' },
       ],

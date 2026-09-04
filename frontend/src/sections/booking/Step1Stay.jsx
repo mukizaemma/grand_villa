@@ -1,21 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Plus, Sparkles } from 'lucide-react';
+import { CalendarDays, Sparkles } from 'lucide-react';
 import { useCart, useCartActions } from '@lib/cart/CartContext';
 import { useBooking } from '@lib/booking/BookingContext';
 import { useAvailability } from '@lib/queries/useAvailability';
+import { useRoomsPage } from '@lib/queries/useRoomsPage';
+import { pickApartment } from '@features/hotel/adapters';
 import { findBlockingClosure, guestClosureMessage } from '@features/hotel/availability';
+import { nightlyRate } from '@lib/booking/pricing';
 import StayDatePicker from '@components/hotel/StayDatePicker';
-import RoomPicker from './RoomPicker';
 import ExperiencePicker from './ExperiencePicker';
 import styles from './Step1Stay.module.css';
 
 export default function Step1Stay() {
   const { rooms, roomCount, experiences } = useCart();
-  const { removeRoom, removeExperience } = useCartActions();
+  const { addRoom, removeRoom } = useCartActions();
   const { stay, nights, setStay } = useBooking();
   const { data: closures = [] } = useAvailability();
-  const [roomPickerOpen, setRoomPickerOpen] = useState(false);
+  const { data: roomsPage } = useRoomsPage();
+  const apartment = pickApartment(roomsPage?.rooms || []);
   const [experiencePickerOpen, setExperiencePickerOpen] = useState(false);
   const blocked = findBlockingClosure(closures, {
     checkIn: stay.checkIn,
@@ -23,33 +26,35 @@ export default function Step1Stay() {
     roomSlugs: rooms.map((room) => room.roomId),
   });
 
-  // Nobody should land on Step 1 with an empty cart — send them back to
-  // browse rooms instead of showing a broken/empty booking form.
+  useEffect(() => {
+    if (!apartment) return
+    rooms.filter((room) => room.roomId !== apartment.id).forEach((room) => removeRoom(room.roomId))
+    if (!rooms.some((room) => room.roomId === apartment.id)) addRoom(apartment)
+  }, [addRoom, apartment, removeRoom, rooms])
+
   if (roomCount === 0) {
     return (
       <div className={styles.card}>
         <div className={styles.empty}>
           <CalendarDays size={28} className={styles.emptyIcon} />
-          <h2 className={styles.emptyTitle}>You haven't added any rooms yet</h2>
+          <h2 className={styles.emptyTitle}>Book the whole apartment</h2>
           <p className={styles.emptyText}>
-            Browse our rooms and tap "Book Now" on the ones you'd like to stay in — they'll
-            show up here.
+            Grand Villa is one villa for a group. We will add it to your stay — or go back to the
+            apartment page if you want to see the space first.
           </p>
           <Link to="/accommodation" className={styles.emptyLink}>
-            Browse rooms
+            See the apartment
           </Link>
         </div>
       </div>
     );
   }
 
-  const handleAddExperience = () => setExperiencePickerOpen(true);
-
   return (
     <div className={styles.card}>
       <h2 className={styles.title}>Your stay</h2>
       <p className={styles.subtitle}>
-        Set your dates and guests, then choose a room to continue.
+        You are booking the whole apartment for the group — dates, guest count, and breakfast.
       </p>
       {blocked && stay.checkIn && stay.checkOut && (
         <p className={styles.dateError}>{guestClosureMessage(blocked)}</p>
@@ -86,9 +91,22 @@ export default function Step1Stay() {
         </label>
       </div>
 
+      <label className={styles.breakfast}>
+        <input
+          type="checkbox"
+          checked={Boolean(stay.includeBreakfast)}
+          onChange={(e) => setStay({ includeBreakfast: e.target.checked })}
+        />
+        <span>
+          Include breakfast for the group
+          <small>$200 a night with breakfast, $150 without. Boat for guests staying in the apartment.</small>
+        </span>
+      </label>
+
       {nights > 0 && (
         <span className={styles.nightsPill}>
           {nights} {nights === 1 ? 'night' : 'nights'}
+          {nights >= 28 ? ' · monthly rate may apply ($2,500)' : ''}
         </span>
       )}
       {stay.checkIn && stay.checkOut && nights <= 0 && (
@@ -104,15 +122,9 @@ export default function Step1Stay() {
                 {stay.checkIn && stay.checkOut
                   ? `${stay.checkIn} → ${stay.checkOut}`
                   : 'Set dates above'}
+                {` · $${nightlyRate(room, stay.includeBreakfast)} / night`}
               </p>
             </div>
-            <button
-              type="button"
-              className={styles.removeLink}
-              onClick={() => removeRoom(room.roomId)}
-            >
-              Remove
-            </button>
           </div>
         ))}
 
@@ -122,29 +134,17 @@ export default function Step1Stay() {
               <p className={styles.roomName}>{exp.name}</p>
               <p className={styles.roomDates}>${exp.price} · experience</p>
             </div>
-            <button
-              type="button"
-              className={styles.removeLink}
-              onClick={() => removeExperience(exp.experienceId)}
-            >
-              Remove
-            </button>
           </div>
         ))}
       </div>
 
       <div className={styles.actions}>
-        <button type="button" className={styles.addRoomBtn} onClick={() => setRoomPickerOpen(true)}>
-          <Plus size={15} />
-          Add room
-        </button>
-        <button type="button" className={styles.addExperienceBtn} onClick={handleAddExperience}>
+        <button type="button" className={styles.addExperienceBtn} onClick={() => setExperiencePickerOpen(true)}>
           <Sparkles size={15} />
-          Add experience
+          Add kayaking or a hike
         </button>
       </div>
 
-      {roomPickerOpen && <RoomPicker onClose={() => setRoomPickerOpen(false)} />}
       {experiencePickerOpen && (
         <ExperiencePicker onClose={() => setExperiencePickerOpen(false)} />
       )}

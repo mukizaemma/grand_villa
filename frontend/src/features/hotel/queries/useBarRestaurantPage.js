@@ -30,9 +30,9 @@ async function fetchBarRestaurantPage() {
     },
 
     homeSpotlight: {
-      eyebrow: page.homeSpotlight?.eyebrow || 'Restaurant',
-      headline: page.homeSpotlight?.headline || 'Taste, sip & relax',
-      intro: page.homeSpotlight?.intro || 'Savor delicious food, drinks, and coffee.',
+      eyebrow: page.homeSpotlight?.eyebrow || 'In-house',
+      headline: page.homeSpotlight?.headline || 'Kitchen and a private bar',
+      intro: page.homeSpotlight?.intro || 'Cook in the apartment kitchen. The bar is for your group staying in the villa — not a public hotel restaurant.',
       features: (page.homeSpotlight?.features || []).filter((item) => item.title).length
         ? page.homeSpotlight.features.map((item) => ({
             id: item.id,

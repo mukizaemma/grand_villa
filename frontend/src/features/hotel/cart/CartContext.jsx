@@ -54,8 +54,10 @@ function cartReducer(state, action) {
             roomId: room.id,
             name: room.name,
             pricePerNight: room.pricePerNight,
-            adults: 2,
+            adults: 6,
             children: 0,
+            priceWithBreakfast: room.priceWithBreakfast,
+            monthlyRate: room.monthlyRate,
           },
         ],
       };

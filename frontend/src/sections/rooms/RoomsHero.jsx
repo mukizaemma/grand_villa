@@ -8,16 +8,16 @@ export default function RoomsHero() {
   return (
     <PageHero
       image={hero.backgroundImage}
-      eyebrow={hero.eyebrow || 'Stay with us'}
-      title={hero.headline || 'Accommodation by Lake Kivu'}
+      eyebrow={hero.eyebrow || 'The apartment'}
+      title={hero.headline || 'One private villa for your group'}
       text={
         hero.intro ||
-        'Rest after a day by the lake, then come back to rooms that still feel like home.'
+        'Six bedrooms, six bathrooms, a kitchen, and a private bar on Lake Kivu. Take the whole building — $150 a night without breakfast, $200 with breakfast, or $2,500 a month.'
       }
       primaryTo={hero.cta?.path || '/book'}
-      primaryLabel={hero.cta?.label || 'Book your stay'}
+      primaryLabel={hero.cta?.label || 'Book the apartment'}
       secondaryTo={hero.secondaryCta?.path || '/contact'}
-      secondaryLabel={hero.secondaryCta?.label || 'Ask about a room'}
+      secondaryLabel={hero.secondaryCta?.label || 'Ask about a month'}
     />
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useSiteLayout } from '@lib/queries/useSiteLayout'
+import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
 import PageLoader from '@components/ui/PageLoader'
 import FloatingCartBar from '@components/cart/FloatingCartBar'
 import Navbar from './Navbar'
@@ -9,8 +10,8 @@ import styles from './Layout.module.css'
 
 const PAGE_TITLES = {
   '/': 'Grand Villa Apartment',
-  '/accommodation': 'Accommodation — Grand Villa Apartment',
-  '/bar-restaurant': 'Bar & Restaurant — Grand Villa Apartment',
+  '/accommodation': 'The apartment — Grand Villa',
+  '/bar-restaurant': 'Kitchen & bar — Grand Villa Apartment',
   '/things-to-do': 'Things to do — Grand Villa Apartment',
   '/gallery': 'Gallery — Grand Villa Apartment',
   '/about': 'About — Grand Villa Apartment',
@@ -58,6 +59,8 @@ export default function Layout({ hasHero = false }) {
       }
       meta.setAttribute('content', keywords)
     }
+
+    applyCompanyFavicon(brandFromCompany(company).logo)
   }, [pathname, company])
 
   if (isLoading) {

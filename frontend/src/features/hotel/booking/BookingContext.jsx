@@ -21,8 +21,9 @@ const STORAGE_KEY = 'gv-booking-stay';
 const defaultStay = {
   checkIn: '',
   checkOut: '',
-  adults: 2,
+  adults: 6,
   children: 0,
+  includeBreakfast: false,
 };
 
 const defaultGuest = {

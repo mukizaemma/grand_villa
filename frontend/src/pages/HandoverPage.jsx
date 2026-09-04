@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { CMS_URL } from '@lib/apiClient'
-import { BRAND } from '@features/hotel/brand'
+import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import SiteAuditBoard from '@features/handover/SiteAuditBoard'
 import { HANDOVER_SECTIONS, HANDOVER_TABS } from '@features/handover/guide'
 import styles from './HandoverPage.module.css'
@@ -17,21 +18,26 @@ async function readJson(path) {
 
 export default function HandoverPage() {
   const [tab, setTab] = useState('overview')
-  const [company, setCompany] = useState(null)
   const [report, setReport] = useState(null)
   const [origin, setOrigin] = useState('')
   const [form, setForm] = useState({ name: '', email: '', section: 'overview', message: '' })
   const [busy, setBusy] = useState(false)
+  const { data: layout } = useSiteLayout()
+  const brand = brandFromCompany(layout?.company)
+  const company = layout?.company
 
   const section = HANDOVER_SECTIONS[tab] || HANDOVER_SECTIONS.overview
   const adminUrl = `${CMS_URL}/admin`
 
   useEffect(() => {
-    document.title = `Handover — ${BRAND.name}`
     setOrigin(window.location.origin)
-    readJson('/api/globals/company?depth=0').then(setCompany).catch(() => {})
     readJson('/api/site-audit/report').then(setReport).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    document.title = `Handover — ${brand.name}`
+    applyCompanyFavicon(brand.logo)
+  }, [brand.logo, brand.name])
 
   const credentials = useMemo(
     () => [
@@ -67,9 +73,9 @@ export default function HandoverPage() {
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <Link to="/" className={styles.brand}>
-          <img src={BRAND.logo} alt="" />
+          {brand.logo ? <img src={brand.logo} alt="" /> : null}
           <div>
-            <strong>{BRAND.shortName}</strong>
+            <strong>{brand.shortName}</strong>
             <small>Handover guide</small>
           </div>
         </Link>

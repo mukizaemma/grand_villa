@@ -12,8 +12,10 @@ export default function BookingFooterBar({
   showContinue = true,
 }) {
   const { rooms, experiences } = useCart();
-  const { step, nights } = useBooking();
-  const estimatedTotal = calcEstimatedTotal(rooms, nights, experiences);
+  const { step, nights, stay } = useBooking();
+  const estimatedTotal = calcEstimatedTotal(rooms, nights, experiences, {
+    includeBreakfast: stay.includeBreakfast,
+  });
 
   return (
     <div className={styles.bar}>

@@ -1,7 +1,7 @@
 import { APIError } from 'payload'
 import { assertBookingCreateRateLimit } from '../../../core/security/rateLimit.js'
 import { findUnavailableStay } from './availability.js'
-import { calcStayTotal, nightsBetween } from './pricing.js'
+import { calcStayTotal, nightlyRate, nightsBetween } from './pricing.js'
 
 // Receives POST /api/bookings from the frontend's booking flow
 // (see useBookingSubmit.js). Rooms are snapshotted (roomId/name/
@@ -65,12 +65,12 @@ export const Bookings = {
         data.rooms = incomingRooms.map((row) => {
           const live = roomBySlug.get(row.roomId)
           if (!live) {
-            throw new APIError(`Room "${row.roomId}" is not available.`, 400)
+            throw new APIError(`Apartment "${row.roomId}" is not available.`, 400)
           }
           return {
             ...row,
             name: live.name,
-            pricePerNight: live.pricePerNight,
+            pricePerNight: nightlyRate(live, Boolean(data.includeBreakfast)),
           }
         })
 
@@ -98,7 +98,17 @@ export const Bookings = {
         }
 
         if (nights > 0) {
-          data.total = calcStayTotal(data.rooms, nights, data.experiences || [])
+          data.includeBreakfast = Boolean(data.includeBreakfast)
+          data.total = calcStayTotal(
+            liveRooms.docs.map((doc) => ({
+              pricePerNight: doc.pricePerNight,
+              priceWithBreakfast: doc.priceWithBreakfast,
+              monthlyRate: doc.monthlyRate,
+            })),
+            nights,
+            data.experiences || [],
+            { includeBreakfast: data.includeBreakfast },
+          )
           data.currency = data.currency || 'USD'
         }
 
@@ -149,13 +159,22 @@ export const Bookings = {
       required: true,
       minRows: 1,
       admin: {
-        description: 'Snapshotted at booking time — not a live relation to Rooms.',
+        description: 'Snapshotted at booking time — the whole apartment, not a live relation.',
       },
       fields: [
         { name: 'roomId', type: 'text', required: true, admin: { width: '25%' } },
         { name: 'name', type: 'text', required: true, admin: { width: '50%' } },
         { name: 'pricePerNight', type: 'number', required: true, admin: { width: '25%' } },
       ],
+    },
+    {
+      name: 'includeBreakfast',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        width: '25%',
+        description: 'Uses the with-breakfast nightly rate when the stay is shorter than a month.',
+      },
     },
     {
       name: 'experiences',

@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { BRAND } from '@features/hotel/brand'
+import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
 import styles from './StaffLoginPage.module.css'
 
 export default function StaffLoginPage() {
   const { user, ready, login } = useStaffAuth()
   const navigate = useNavigate()
+  const { data } = useSiteLayout()
+  const brand = brandFromCompany(data?.company)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    document.title = `Staff sign in — ${BRAND.shortName}`
+    document.title = `Staff sign in — ${brand.shortName}`
+    applyCompanyFavicon(brand.logo)
     if (ready && user) navigate('/staff', { replace: true })
-  }, [ready, user, navigate])
+  }, [brand.logo, brand.shortName, ready, user, navigate])
 
   async function onSubmit(event) {
     event.preventDefault()
@@ -37,8 +41,8 @@ export default function StaffLoginPage() {
         ← Back to home
       </Link>
       <form className={styles.card} onSubmit={onSubmit}>
-        <img className={styles.logo} src={BRAND.logo} alt={BRAND.name} />
-        <h1>{BRAND.shortName}</h1>
+        {brand.logo ? <img className={styles.logo} src={brand.logo} alt={brand.name} /> : null}
+        <h1>{brand.shortName}</h1>
         <p>Sign in with your property admin account.</p>
         <label>
           Email

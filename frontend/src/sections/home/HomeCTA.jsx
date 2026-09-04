@@ -39,7 +39,7 @@ export default function HomeCTA() {
 
             {cta?.path ? (
               <Link to={cta.path} className={styles.ctaBtn}>
-                {cta.label || 'Book your stay'}
+                {cta.label || 'Book the apartment'}
               </Link>
             ) : null}
 

@@ -40,7 +40,7 @@ const EMAIL_CONFIGURED = Boolean(SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY);
 
 export function buildSummaryText({ rooms, experiences, stay, nights, guest, total }) {
   const roomLines = rooms
-    .map((r) => `- ${r.name} (${r.adults} adult(s), ${r.children} child(ren))`)
+    .map((r) => `- ${r.name} (${stay.includeBreakfast ? 'with breakfast' : 'without breakfast'})`)
     .join('\n');
   const experienceLines = experiences.length
     ? `\nExperiences:\n${experiences.map((e) => `- ${e.name} ($${e.price})`).join('\n')}`
@@ -49,7 +49,7 @@ export function buildSummaryText({ rooms, experiences, stay, nights, guest, tota
   return [
     `New booking request — ${guest.firstName} ${guest.lastName}`,
     `Dates: ${stay.checkIn} → ${stay.checkOut} (${nights} night(s))`,
-    `Rooms:\n${roomLines}${experienceLines}`,
+    `Stay:\n${roomLines}${experienceLines}`,
     `Total: $${total.toFixed(2)}`,
     `Mobile: ${guest.mobile}`,
     guest.email ? `Email: ${guest.email}` : null,
@@ -80,6 +80,7 @@ export async function createBookingRequest({ rooms, experiences, stay, guest, de
     checkOut: stay.checkOut,
     adults: stay.adults,
     children: stay.children,
+    includeBreakfast: Boolean(stay.includeBreakfast),
     guest: {
       firstName: guest.firstName,
       lastName: guest.lastName,

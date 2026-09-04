@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BRAND } from '@features/hotel/brand'
+import { brandFromCompany } from '@features/hotel/companyBrand'
+import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
 import styles from './StaffLoginPage.module.css'
 
 export default function StaffForgotPage() {
   const { forgotPassword } = useStaffAuth()
+  const { data } = useSiteLayout()
+  const brand = brandFromCompany(data?.company)
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [sent, setSent] = useState(false)
@@ -31,7 +34,7 @@ export default function StaffForgotPage() {
         ← Back to home
       </Link>
       <form className={styles.card} onSubmit={onSubmit}>
-        <img className={styles.logo} src={BRAND.logo} alt={BRAND.name} />
+        {brand.logo ? <img className={styles.logo} src={brand.logo} alt={brand.name} /> : null}
         <h1>Reset password</h1>
         {sent ? (
           <p className={styles.note}>

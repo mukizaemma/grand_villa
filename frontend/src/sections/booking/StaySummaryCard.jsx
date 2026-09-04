@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useCart, useCartActions } from '@lib/cart/CartContext';
 import { useBooking } from '@lib/booking/BookingContext';
-import { calcEstimatedTotal } from '@lib/booking/pricing';
+import { calcEstimatedTotal, nightlyRate } from '@lib/booking/pricing';
 import ExperiencePicker from './ExperiencePicker';
 import styles from './StaySummaryCard.module.css';
 
@@ -16,11 +16,13 @@ function formatDate(iso) {
 }
 
 export default function StaySummaryCard() {
-  const { rooms, experiences, roomCount } = useCart();
-  const { removeRoom, removeExperience } = useCartActions();
+  const { rooms, experiences } = useCart();
+  const { removeExperience } = useCartActions();
   const { stay, nights } = useBooking();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const estimatedTotal = calcEstimatedTotal(rooms, nights, experiences);
+  const estimatedTotal = calcEstimatedTotal(rooms, nights, experiences, {
+    includeBreakfast: stay.includeBreakfast,
+  });
 
   const dateRangeLabel =
     stay.checkIn && stay.checkOut
@@ -33,34 +35,30 @@ export default function StaySummaryCard() {
 
       <div className={styles.body}>
         <p className={styles.dates}>
-          {dateRangeLabel} · {roomCount} {roomCount === 1 ? 'room' : 'rooms'}
+          {dateRangeLabel} · the whole apartment
         </p>
 
         {rooms.length === 0 && experiences.length === 0 ? (
-          <p className={styles.emptyNote}>No rooms added yet.</p>
+          <p className={styles.emptyNote}>The apartment is not in your stay yet.</p>
         ) : (
           <ul className={styles.roomList}>
-            {rooms.map((room) => (
+            {rooms.map((room) => {
+              const rate = nightlyRate(room, stay.includeBreakfast)
+              return (
               <li key={room.roomId} className={styles.roomLine}>
                 <div className={styles.roomLineTop}>
                   <span className={styles.roomName}>{room.name}</span>
-                  <button
-                    type="button"
-                    className={styles.removeLink}
-                    onClick={() => removeRoom(room.roomId)}
-                  >
-                    Remove
-                  </button>
                 </div>
                 <p className={styles.roomMeta}>
                   {nights > 0 ? `${nights} night(s) · ` : ''}
-                  {room.adults} adult(s), {room.children} child(ren)
+                  {stay.includeBreakfast ? 'with breakfast' : 'without breakfast'}
                 </p>
                 <p className={styles.roomPrice}>
-                  ${(nights > 0 ? room.pricePerNight * nights : room.pricePerNight).toFixed(2)}
+                  ${(nights > 0 ? rate * nights : rate).toFixed(2)}
                 </p>
               </li>
-            ))}
+              )
+            })}
 
             {experiences.map((exp) => (
               <li key={exp.experienceId} className={styles.roomLine}>

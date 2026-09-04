@@ -3,7 +3,6 @@ import PageLoader from '@components/ui/PageLoader'
 import BarRestaurantHero from '@sections/bar-restaurant/BarRestaurantHero'
 import BarRestaurantHours from '@sections/bar-restaurant/BarRestaurantHours'
 import BarRestaurantPanels from '@sections/bar-restaurant/BarRestaurantPanels'
-import BarRestaurantMenu from '@sections/bar-restaurant/BarRestaurantMenu'
 import BarRestaurantVideo from '@sections/bar-restaurant/BarRestaurantVideo'
 import BarRestaurantCTA from '@sections/bar-restaurant/BarRestaurantCTA'
 
@@ -24,7 +23,6 @@ export default function BarRestaurantPage() {
       <BarRestaurantHero />
       <BarRestaurantHours />
       <BarRestaurantPanels />
-      <BarRestaurantMenu />
       <BarRestaurantVideo />
       <BarRestaurantCTA />
     </>
