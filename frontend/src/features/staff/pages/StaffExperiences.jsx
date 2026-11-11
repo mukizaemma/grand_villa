@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { asHtml, htmlToLexical } from '@lib/richText'
+import { asHtml, asPlain, htmlToLexical } from '@lib/richText'
 import { mediaUrl } from '@features/hotel/adapters'
 import { staffClient, mediaId } from '../api/staffClient'
 import { slugify } from '../lib/slugify'
 import MediaField from '../components/MediaField'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import SummernoteField from '../components/SummernoteField'
 import '../staff.css'
@@ -14,6 +15,7 @@ const empty = { name: '', slug: '', price: '', description: '', image: '' }
 export default function StaffExperiences() {
   const [rows, setRows] = useState([])
   const [form, setForm] = useState(null)
+  const [view, setView] = useState(null)
 
   async function load() {
     const { data } = await staffClient.get('/api/experiences?limit=100&depth=1')
@@ -29,7 +31,7 @@ export default function StaffExperiences() {
       id: row.id,
       name: row.name || '',
       slug: row.slug || '',
-      price: row.price || '',
+      price: row.price ?? '',
       description: asHtml(row.description),
       image: row.image || '',
     })
@@ -82,7 +84,7 @@ export default function StaffExperiences() {
               <th></th>
               <th>Name</th>
               <th>Price</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -98,20 +100,26 @@ export default function StaffExperiences() {
                 <td>{row.name}</td>
                 <td>${row.price}</td>
                 <td>
-                  <div className="rowActions">
-                    <button type="button" className="staffBtn" onClick={() => openEdit(row)}>
-                      Edit
-                    </button>
-                    <button type="button" className="staffBtn staffBtnDanger" onClick={() => remove(row.id)}>
-                      Delete
-                    </button>
-                  </div>
+                  <RowActions onView={() => setView(row)} onEdit={() => openEdit(row)} onDelete={() => remove(row.id)} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {view && (
+        <StaffModal title={view.name || 'Activity'} onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>Price</strong><br />${view.price ?? '—'}</p>
+            <p className="full"><strong>Description</strong><br />{asPlain(view.description) || '—'}</p>
+          </div>
+          <div className="formActions full">
+            <button type="button" className="staffBtn staffBtnGhost" onClick={() => setView(null)}>Close</button>
+            <button type="button" className="staffBtn" onClick={() => { openEdit(view); setView(null) }}>Edit</button>
+          </div>
+        </StaffModal>
+      )}
 
       {form && (
         <StaffModal title={form.id ? 'Edit activity' : 'Add activity'} wide onClose={() => setForm(null)}>

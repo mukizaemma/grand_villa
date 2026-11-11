@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { FEATURE_LIBRARY } from '@features/hotel/rooms/featureLibrary'
 import { mediaUrl } from '@features/hotel/adapters'
-import { asHtml, htmlToLexical, isBlankHtml } from '@lib/richText'
+import { asHtml, asPlain, htmlToLexical, isBlankHtml } from '@lib/richText'
 import { staffClient, mediaId } from '../api/staffClient'
+import RowActions from '../components/RowActions'
 import { slugify } from '../lib/slugify'
 import MediaGalleryField from '../components/MediaGalleryField'
 import StaffModal from '../components/StaffModal'
@@ -35,6 +36,7 @@ const SPEC_FIELDS = [
 export default function StaffRooms() {
   const [rows, setRows] = useState([])
   const [form, setForm] = useState(null)
+  const [view, setView] = useState(null)
 
   async function load() {
     const { data } = await staffClient.get('/api/rooms?limit=100&depth=1')
@@ -54,10 +56,10 @@ export default function StaffRooms() {
       id: row.id,
       name: row.name || '',
       slug: row.slug || '',
-      pricePerNight: row.pricePerNight || '',
-      priceWithBreakfast: row.priceWithBreakfast || '',
-      monthlyRate: row.monthlyRate || '',
-      units: row.units || 1,
+      pricePerNight: row.pricePerNight ?? '',
+      priceWithBreakfast: row.priceWithBreakfast ?? '',
+      monthlyRate: row.monthlyRate ?? '',
+      units: row.units ?? 1,
       description: asHtml(row.description),
       specs: { ...empty.specs, ...row.specs },
       features: row.features || [],
@@ -132,7 +134,7 @@ export default function StaffRooms() {
               <th>Price / night</th>
               <th>With breakfast</th>
               <th>Monthly</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -150,20 +152,29 @@ export default function StaffRooms() {
                 <td>{row.priceWithBreakfast ? `$${row.priceWithBreakfast}` : '—'}</td>
                 <td>{row.monthlyRate ? `$${row.monthlyRate}` : '—'}</td>
                 <td>
-                  <div className="rowActions">
-                    <button type="button" className="staffBtn" onClick={() => openEdit(row)}>
-                      Edit
-                    </button>
-                    <button type="button" className="staffBtn staffBtnDanger" onClick={() => remove(row.id)}>
-                      Delete
-                    </button>
-                  </div>
+                  <RowActions onView={() => setView(row)} onEdit={() => openEdit(row)} onDelete={() => remove(row.id)} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {view && (
+        <StaffModal title={view.name || 'Apartment'} onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>Nightly, no breakfast</strong><br />${view.pricePerNight ?? '—'}</p>
+            <p><strong>With breakfast</strong><br />{view.priceWithBreakfast != null ? `$${view.priceWithBreakfast}` : '—'}</p>
+            <p><strong>Monthly</strong><br />{view.monthlyRate != null ? `$${view.monthlyRate}` : '—'}</p>
+            <p><strong>Units</strong><br />{view.units ?? '—'}</p>
+            <p className="full"><strong>Description</strong><br />{asPlain(view.description) || '—'}</p>
+          </div>
+          <div className="formActions full">
+            <button type="button" className="staffBtn staffBtnGhost" onClick={() => setView(null)}>Close</button>
+            <button type="button" className="staffBtn" onClick={() => { openEdit(view); setView(null) }}>Edit</button>
+          </div>
+        </StaffModal>
+      )}
 
       {form && (
         <StaffModal title={form.id ? 'Edit apartment' : 'Add apartment'} wide onClose={() => setForm(null)}>

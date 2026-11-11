@@ -1,3 +1,5 @@
+import { rowActionsField } from '../../../core/fields/rowActions.js'
+
 export const GalleryPhotos = {
   slug: 'gallery-photos',
   access: {
@@ -10,17 +12,54 @@ export const GalleryPhotos = {
   admin: {
     group: false,
     useAsTitle: 'caption',
-    defaultColumns: ['caption', 'category', 'photo'],
-    description: 'Legacy gallery rows. The public Gallery now uses Media files marked Show on gallery.',
+    defaultColumns: ['caption', 'photo', 'updatedAt', 'rowActions'],
+    description: 'Every image stored on the server. Sort the ones that should appear on the public gallery, and remove duplicates or photos that do not belong there.',
+    components: {
+      views: {
+        list: {
+          Component: './src/components/payload/SiteGalleryList/index.jsx#SiteGalleryList',
+        },
+      },
+    },
+  },
+  hooks: {
+    beforeValidate: [
+      ({ data, req }) => {
+        if (!data) return data
+        if (!data.category || data.category === 'none') data.category = 'rooms'
+        if (!data.aspect) data.aspect = 'square'
+        if (!data.caption) {
+          const fileName = req?.file?.name || ''
+          data.caption = fileName ? fileName.replace(/\.[^.]+$/, '') : 'Gallery photo'
+        }
+        return data
+      },
+    ],
+    afterChange: [
+      async ({ doc, req }) => {
+        const id = typeof doc.photo === 'object' ? doc.photo?.id : doc.photo
+        if (!id) return
+        try {
+          await req.payload.update({
+            collection: 'media',
+            id,
+            data: { showOnGallery: true },
+            overrideAccess: true,
+          })
+        } catch {
+          /* the gallery row still stores the photo */
+        }
+      },
+    ],
   },
   fields: [
+    rowActionsField,
     {
       name: 'category',
       type: 'select',
-      required: true,
-      admin: { width: '25%' },
+      defaultValue: 'rooms',
+      admin: { hidden: true },
       options: [
-        { label: 'None — do not show', value: 'none' },
         { label: 'The apartment', value: 'rooms' },
         { label: 'Kitchen & bar', value: 'bar-restaurant' },
         { label: 'Property & views', value: 'lake-grounds' },
@@ -30,17 +69,13 @@ export const GalleryPhotos = {
     {
       name: 'caption',
       type: 'text',
-      required: true,
-      admin: { width: '50%' },
+      admin: { width: '50%', description: 'Optional. The file name is used when this is left blank.' },
     },
     {
       name: 'aspect',
       type: 'select',
       defaultValue: 'square',
-      admin: {
-        width: '25%',
-        description: 'Controls the masonry tile height on the Gallery page',
-      },
+      admin: { hidden: true },
       options: [
         { label: 'Tall', value: 'tall' },
         { label: 'Square', value: 'square' },
@@ -53,7 +88,7 @@ export const GalleryPhotos = {
       relationTo: 'media',
       required: true,
       displayPreview: true,
-      admin: { description: 'Create New to upload, or Choose from existing in the Media library.' },
+      admin: { description: 'Upload a new photo or choose one from the library.' },
     },
   ],
 }

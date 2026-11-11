@@ -49,7 +49,6 @@ export default function ThingsToDoPage() {
                 <div className={styles.body}>
                   <h3>{item.name}</h3>
                   <p>{item.description}</p>
-                  {item.price ? <strong>From ${item.price}</strong> : null}
                 </div>
               </article>
             )}

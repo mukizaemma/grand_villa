@@ -103,6 +103,12 @@
   margin-top: 0.2rem;
 }
 
+.whatsappCheck span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .termsRow a {
   color: var(--color-lake-teal);
   font-weight: 600;

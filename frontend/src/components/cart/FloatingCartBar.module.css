@@ -78,8 +78,13 @@
   transition: transform var(--transition-base);
 }
 
-.continueBtn:hover {
+.continueBtn:hover:not(:disabled) {
   transform: translateY(-1px);
+}
+
+.continueBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 @media (max-width: 560px) {

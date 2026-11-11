@@ -43,9 +43,11 @@
 .media-grid-field__actions label {
   border: 1px solid #d8cdbe;
   background: #fff;
+  color: #1c1916;
   border-radius: 6px;
   padding: 0.4rem 0.7rem;
   font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
 }
 

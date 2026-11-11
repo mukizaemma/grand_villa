@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Eye, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { staffClient } from '../api/staffClient'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import '../staff.css'
 
@@ -62,6 +62,7 @@ export default function StaffReservations() {
   const [end, setEnd] = useState(today)
   const [applied, setApplied] = useState({ start: '', end: '' })
   const [view, setView] = useState(null)
+  const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
 
   async function load() {
@@ -235,7 +236,7 @@ export default function StaffReservations() {
               <th>Check-out</th>
               <th>Days</th>
               <th>Amount</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -258,22 +259,19 @@ export default function StaffReservations() {
                 <td>{stayNights(row)}</td>
                 <td>{money(row.total, row.currency)}</td>
                 <td>
-                  <div className="rowActions">
-                    <button
-                      type="button"
-                      className="iconBtn iconView"
-                      onClick={() => {
-                        setView(row)
-                        setDraft('')
-                      }}
-                      aria-label="View"
-                    >
-                      <Eye size={15} />
-                    </button>
-                    <button type="button" className="iconBtn iconDelete" onClick={() => remove(row.id)} aria-label="Delete">
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
+                  <RowActions
+                    onView={() => {
+                      setEditing(false)
+                      setDraft('')
+                      setView(row)
+                    }}
+                    onEdit={() => {
+                      setEditing(true)
+                      setDraft('')
+                      setView(row)
+                    }}
+                    onDelete={() => remove(row.id)}
+                  />
                 </td>
               </tr>
             ))}
@@ -297,7 +295,7 @@ export default function StaffReservations() {
       </div>
 
       {view && (
-        <StaffModal title="Reservation" wide onClose={() => setView(null)}>
+        <StaffModal title={editing ? 'Edit reservation' : 'Reservation'} wide onClose={() => setView(null)}>
           <div className="detailGrid">
             <p>
               <strong>Guest</strong>
@@ -321,6 +319,8 @@ export default function StaffReservations() {
               <br />
               {day(view.checkIn)} – {day(view.checkOut)} · {stayNights(view)} night
               {stayNights(view) === 1 ? '' : 's'}
+              {Number(view.adults) ? ` · ${view.adults} guest${Number(view.adults) === 1 ? '' : 's'}` : ''}
+              {Number(view.beds) ? ` · ${view.beds} bed${Number(view.beds) === 1 ? '' : 's'}` : ''}
             </p>
             <p>
               <strong>Payment</strong>
@@ -361,6 +361,7 @@ export default function StaffReservations() {
             ))}
           </div>
 
+          {editing && (
           <label className="staffField full">
             Message
             <textarea
@@ -370,7 +371,9 @@ export default function StaffReservations() {
               placeholder="Write a reply, log a guest message, or add an internal note…"
             />
           </label>
+          )}
 
+          {editing && (
           <div className="formActions">
             <button type="button" className="staffBtn" onClick={() => replyToGuest(view)}>
               {preferredChannel(view) === 'whatsapp' ? 'Reply on WhatsApp' : 'Reply by Email'}
@@ -391,6 +394,7 @@ export default function StaffReservations() {
               Delete
             </button>
           </div>
+          )}
         </StaffModal>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { rowActionsField } from '../fields/rowActions.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -12,8 +13,15 @@ export const Media = {
   admin: {
     group: false,
     useAsTitle: 'filename',
-    defaultColumns: ['filename', 'alt', 'showOnGallery', 'updatedAt'],
+    defaultColumns: ['filename', 'alt', 'showOnGallery', 'updatedAt', 'rowActions'],
     description: 'All images and videos. On any page field, choose an existing file or upload a new one.',
+    components: {
+      views: {
+        list: {
+          Component: './src/components/payload/MediaLibraryList/index.jsx#MediaLibraryList',
+        },
+      },
+    },
   },
   access: {
     read: () => true,
@@ -41,18 +49,8 @@ export const Media = {
       { name: 'hero', width: 1600, height: undefined, position: 'centre' },
     ],
   },
-  hooks: {
-    beforeChange: [
-      ({ data }) => {
-        if (!data) return data
-        if (data.galleryCategory != null) {
-          data.showOnGallery = data.galleryCategory !== 'none'
-        }
-        return data
-      },
-    ],
-  },
   fields: [
+    rowActionsField,
     {
       name: 'alt',
       type: 'text',
@@ -63,13 +61,9 @@ export const Media = {
       name: 'galleryCategory',
       type: 'select',
       defaultValue: 'none',
-      admin: {
-        width: '25%',
-        description:
-          'Choose None to keep this file in the library only. The apartment category appears on the homepage (latest 4 photos) and on the Gallery page.',
-      },
+      admin: { hidden: true },
       options: [
-        { label: 'None — do not show on gallery', value: 'none' },
+        { label: 'None', value: 'none' },
         { label: 'The apartment', value: 'rooms' },
         { label: 'Kitchen & bar', value: 'bar-restaurant' },
         { label: 'Property & views', value: 'lake-grounds' },
@@ -86,9 +80,15 @@ export const Media = {
       name: 'showOnGallery',
       type: 'checkbox',
       defaultValue: false,
+      admin: { hidden: true },
+    },
+    {
+      name: 'hiddenFromGallery',
+      type: 'checkbox',
+      defaultValue: false,
       admin: {
-        width: '25%',
-        description: 'Turned on automatically when a gallery category is chosen. None keeps it off the public gallery.',
+        hidden: true,
+        description: 'Removed from the public gallery. The file stays in the media library.',
       },
     },
   ],

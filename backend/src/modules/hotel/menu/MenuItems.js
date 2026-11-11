@@ -1,5 +1,6 @@
 import { applyAutoSlug } from '../../../core/fields/slug.js'
 import { previewUpload } from '../../../core/fields/pageHero.js'
+import { rowActionsField } from '../../../core/fields/rowActions.js'
 
 export const MENU_CATEGORIES = ['Starter', 'Main', 'Drink', 'Dessert', 'Breakfast']
 
@@ -24,13 +25,14 @@ export const MenuItems = {
   admin: {
     group: false,
     useAsTitle: 'name',
-    defaultColumns: ['image', 'name', 'category', 'price', 'available'],
+    defaultColumns: ['image', 'name', 'category', 'price', 'available', 'rowActions'],
     description: 'Dishes and drinks on the Bar & Restaurant page. Guests can send an order on WhatsApp.',
   },
   hooks: {
     beforeValidate: [applyAutoSlug],
   },
   fields: [
+    rowActionsField,
     { name: 'name', type: 'text', required: true, admin: { width: '25%' } },
     {
       name: 'price',

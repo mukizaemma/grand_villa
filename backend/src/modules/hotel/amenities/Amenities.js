@@ -1,5 +1,6 @@
 import { applyAutoSlug } from '../../../core/fields/slug.js'
 import { previewUpload } from '../../../core/fields/pageHero.js'
+import { rowActionsField } from '../../../core/fields/rowActions.js'
 
 export const Amenities = {
   slug: 'amenities',
@@ -13,13 +14,14 @@ export const Amenities = {
   admin: {
     group: false,
     useAsTitle: 'name',
-    defaultColumns: ['image', 'name', 'updatedAt'],
+    defaultColumns: ['image', 'name', 'updatedAt', 'rowActions'],
     description: 'Apartment amenities shown on the public site.',
   },
   hooks: {
     beforeValidate: [applyAutoSlug],
   },
   fields: [
+    rowActionsField,
     { name: 'name', type: 'text', required: true, admin: { width: '25%' } },
     {
       name: 'icon',

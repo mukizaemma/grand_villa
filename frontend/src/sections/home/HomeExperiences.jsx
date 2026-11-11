@@ -45,7 +45,6 @@ export default function HomeExperiences() {
               <div className={styles.body}>
                 <h3>{item.name}</h3>
                 {item.description ? <p>{item.description}</p> : null}
-                {item.price ? <strong>From ${item.price}</strong> : <strong>Ask the desk to arrange</strong>}
               </div>
             </Reveal>
           ))}

@@ -3,73 +3,27 @@
   padding-block: var(--space-2xl);
 }
 
-/* ── Filters ────────────────────────────────────────────── */
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem;
-  margin-bottom: var(--space-xl);
-}
-
 .empty {
   text-align: center;
   color: var(--color-muted, #6b6258);
   padding-block: var(--space-lg);
 }
 
-.filterBtn {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  transition: background var(--transition-base), color var(--transition-base),
-    border-color var(--transition-base);
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
 }
 
-.filterBtn:hover {
-  border-color: var(--color-terracotta);
-  color: var(--color-charcoal);
-}
-
-.filterBtnActive {
-  background: var(--color-lake-teal);
-  border-color: var(--color-lake-teal);
-  color: var(--color-sand);
-}
-
-/* ── Masonry ────────────────────────────────────────────── */
-
-.masonry {
-  column-count: 1;
-  column-gap: var(--space-sm);
-}
-
-.masonry > * {
-  break-inside: avoid;
-  width: 100%;
-}
-
-@media (min-width: 560px) {
-  .masonry {
-    column-count: 2;
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 860px) {
-  .masonry {
-    column-count: 3;
-  }
-}
-
-@media (min-width: 1180px) {
-  .masonry {
-    column-count: 4;
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -77,24 +31,38 @@
   position: relative;
   display: block;
   width: 100%;
-  margin-bottom: var(--space-sm);
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-sm);
   background-size: cover;
   background-position: center;
-  break-inside: avoid;
   overflow: hidden;
 }
 
-.aspectTall {
-  aspect-ratio: 3 / 4;
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: var(--space-xl);
 }
 
-.aspectSquare {
-  aspect-ratio: 1 / 1;
+.pager button {
+  min-width: 2.4rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-charcoal);
+  font-size: 0.82rem;
 }
 
-.aspectWide {
-  aspect-ratio: 4 / 3;
+.pager button:disabled {
+  opacity: 0.4;
+}
+
+.pager .pageActive {
+  background: var(--color-navy);
+  border-color: var(--color-navy);
+  color: #fff;
 }
 
 .tileOverlay {

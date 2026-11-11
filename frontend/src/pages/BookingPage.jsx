@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { BookingProvider, useBooking } from '@lib/booking/BookingContext';
+import { clearBookingChrome, setBookingChrome } from '@features/hotel/booking/bookingChrome';
 import { useCart } from '@lib/cart/CartContext';
 import { useAvailability } from '@lib/queries/useAvailability';
 import { findBlockingClosure } from '@features/hotel/availability';
@@ -26,8 +28,33 @@ function BookingFlow() {
     }),
   );
 
+  const guestCount = Number(stay.adults) || 0;
   const step1Valid = Boolean(stay.checkIn && stay.checkOut && nights > 0 && roomCount > 0 && !datesClosed);
-  const step2Valid = Boolean(guest.firstName && guest.lastName && guest.mobile);
+  const step2Valid = Boolean(guest.firstName && guest.lastName && guest.mobile && guestCount >= 1);
+
+  useEffect(() => {
+    const canContinue = step === 1 ? step1Valid : step === 2 ? step2Valid : false;
+    setBookingChrome({
+      active: true,
+      step,
+      canContinue,
+      continue: () => {
+        if (step === 1 && step1Valid) nextStep();
+        if (step === 2 && step2Valid) nextStep();
+      },
+    });
+  }, [nextStep, step, step1Valid, step2Valid]);
+
+  useEffect(() => () => clearBookingChrome(), []);
+
+  const skipScroll = useRef(true);
+  useEffect(() => {
+    if (skipScroll.current) {
+      skipScroll.current = false;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   return (
     <>

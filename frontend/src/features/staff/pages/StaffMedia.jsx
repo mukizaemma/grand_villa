@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { mediaUrl } from '@features/hotel/adapters'
-import { GALLERY_CATEGORIES } from '@features/hotel/gallery/categories'
 import { staffClient } from '../api/staffClient'
 import { formatBytes, prepareUploadFiles, uploadMediaFile } from '../lib/prepareImage'
 import '../staff.css'
 import fieldStyles from '../components/MediaField.module.css'
 
 const PAGE_SIZE = 18
-const categories = [
-  { id: 'none', label: 'None — library only' },
-  ...GALLERY_CATEGORIES.filter((item) => item.id !== 'all'),
-]
 
 export default function StaffMedia() {
   const [page, setPage] = useState(1)
@@ -20,7 +15,6 @@ export default function StaffMedia() {
   const [queue, setQueue] = useState([])
   const [busy, setBusy] = useState(false)
   const [showOnGallery, setShowOnGallery] = useState(false)
-  const [galleryCategory, setGalleryCategory] = useState('none')
 
   async function load(nextPage = page) {
     const { data } = await staffClient.get('/api/media', {
@@ -73,7 +67,6 @@ export default function StaffMedia() {
         await staffClient.patch(`/api/media/${doc.id}`, {
           alt: item.file.name,
           showOnGallery,
-          galleryCategory,
         })
       }
       toast.success(queue.length === 1 ? 'Image uploaded.' : `${queue.length} images uploaded.`)
@@ -97,23 +90,6 @@ export default function StaffMedia() {
         <label className="staffBtn">
           Choose images
           <input type="file" accept="image/*" multiple hidden onChange={pickFiles} />
-        </label>
-        <label className="staffField">
-          Category if added to the website gallery
-          <select
-            value={galleryCategory}
-            onChange={(e) => {
-              const next = e.target.value
-              setGalleryCategory(next)
-              setShowOnGallery(next !== 'none')
-            }}
-          >
-            {categories.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
         </label>
         <label className="staffCheck">
           <input

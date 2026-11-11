@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { mediaUrl } from '@features/hotel/adapters'
-import { GALLERY_CATEGORIES } from '@features/hotel/gallery/categories'
 import { mediaId, staffClient } from '../api/staffClient'
 import { formatBytes, prepareUploadFiles, uploadMediaFile } from '../lib/prepareImage'
 import MediaLibraryPicker from '../components/MediaLibraryPicker'
 import '../staff.css'
 import fieldStyles from '../components/MediaField.module.css'
-
-const categories = [
-  { id: 'none', label: 'None — hide from gallery' },
-  ...GALLERY_CATEGORIES.filter((item) => item.id !== 'all'),
-]
 
 export default function StaffGallery() {
   const [rows, setRows] = useState([])
@@ -31,7 +25,6 @@ export default function StaffGallery() {
         return staffClient.patch(`/api/media/${id}`, {
           showOnGallery: true,
           galleryOrder: index + 1,
-          galleryCategory: row.category || 'rooms',
           alt: row.caption || undefined,
         })
       }),
@@ -43,8 +36,8 @@ export default function StaffGallery() {
       params: {
         limit: 200,
         sort: 'galleryOrder,-createdAt',
-        'where[and][0][showOnGallery][equals]': true,
-        'where[and][1][mimeType][contains]': 'image',
+        'where[and][0][mimeType][contains]': 'image',
+        'where[and][1][hiddenFromGallery][not_equals]': true,
       },
     })
     let docs = first.data.docs || []
@@ -54,8 +47,8 @@ export default function StaffGallery() {
         params: {
           limit: 200,
           sort: 'galleryOrder,-createdAt',
-          'where[and][0][showOnGallery][equals]': true,
-          'where[and][1][mimeType][contains]': 'image',
+          'where[and][0][mimeType][contains]': 'image',
+          'where[and][1][hiddenFromGallery][not_equals]': true,
         },
       })
       docs = again.data.docs || []
@@ -72,7 +65,7 @@ export default function StaffGallery() {
     try {
       await Promise.all(
         nextRows.map((row, index) =>
-          staffClient.patch(`/api/media/${row.id}`, { galleryOrder: index + 1, showOnGallery: true }),
+          staffClient.patch(`/api/media/${row.id}`, { galleryOrder: index + 1, hiddenFromGallery: false }),
         ),
       )
     } catch {
@@ -92,7 +85,7 @@ export default function StaffGallery() {
 
   async function hide(id) {
     try {
-      await staffClient.patch(`/api/media/${id}`, { showOnGallery: false })
+      await staffClient.patch(`/api/media/${id}`, { hiddenFromGallery: true, showOnGallery: false })
       toast.success('Removed from the website gallery.')
       load()
     } catch {
@@ -107,8 +100,8 @@ export default function StaffGallery() {
         list.map((file) =>
           staffClient.patch(`/api/media/${file.id}`, {
             showOnGallery: true,
+            hiddenFromGallery: false,
             galleryOrder: 0,
-            galleryCategory: file.galleryCategory || 'rooms',
           }),
         ),
       )
@@ -142,7 +135,7 @@ export default function StaffGallery() {
         const doc = await uploadMediaFile(staffClient, item.file, { alt: item.file.name })
         await staffClient.patch(`/api/media/${doc.id}`, {
           showOnGallery: true,
-          galleryCategory: 'rooms',
+          hiddenFromGallery: false,
         })
       }
       toast.success(`${queue.length} image${queue.length === 1 ? '' : 's'} uploaded.`)
@@ -156,24 +149,11 @@ export default function StaffGallery() {
     }
   }
 
-  async function setCategory(id, galleryCategory) {
-    try {
-      await staffClient.patch(`/api/media/${id}`, {
-        galleryCategory,
-        showOnGallery: galleryCategory !== 'none',
-      })
-      setRows((current) => current.map((row) => (row.id === id ? { ...row, galleryCategory } : row)))
-    } catch {
-      toast.error('Could not update the category.')
-    }
-  }
-
   return (
     <div className="staffPage">
       <h1>Website gallery</h1>
       <p className="staffLead">
-        Upload photos of the apartment. New files are tagged The apartment and appear on the
-        homepage (latest 4) and the full Gallery page. Files over 700KB are resized first.
+        Upload one photo or several. They appear together on the Gallery page, with 15 photos at a time. Files over 700KB are resized first.
       </p>
       <div className="staffToolbar">
         <label className="staffBtn">
@@ -227,19 +207,6 @@ export default function StaffGallery() {
             <img src={mediaUrl(row)} alt={row.alt || row.filename} />
             <div>
               <p>{row.alt || row.filename}</p>
-              <label className="staffField" style={{ margin: '0.4rem 0' }}>
-                Category
-                <select
-                  value={row.galleryCategory || 'rooms'}
-                  onChange={(e) => setCategory(row.id, e.target.value)}
-                >
-                  {categories.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
               <div className="rowActions">
                 <button type="button" className="staffBtn staffBtnGhost" onClick={() => move(index, -1)} disabled={index === 0}>
                   Up
@@ -266,7 +233,7 @@ export default function StaffGallery() {
 
       <MediaLibraryPicker
         open={pickerOpen}
-        title="Add an existing image to the gallery"
+        title="Add existing images to the gallery"
         onClose={() => setPickerOpen(false)}
         multiple
         onSelectMany={addFromLibrary}

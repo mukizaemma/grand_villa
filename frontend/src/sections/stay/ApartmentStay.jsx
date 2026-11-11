@@ -22,11 +22,11 @@ export default function ApartmentStay({ apartment, section, showHeader = true, c
         ) : null}
 
         <Reveal className={styles.panel}>
-          <div
-            className={styles.photo}
-            style={image ? { backgroundImage: `url("${image}")` } : undefined}
-            aria-hidden="true"
-          />
+          <div className={styles.photo}>
+            {image ? (
+              <img src={image} alt={apartment?.name || 'Grand Villa Apartment'} />
+            ) : null}
+          </div>
           <div className={styles.copy}>
             {compact ? null : <p className={styles.kicker}>One building · your group</p>}
             <h3>{apartment?.name || 'Grand Villa Apartment'}</h3>

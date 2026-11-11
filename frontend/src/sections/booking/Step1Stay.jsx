@@ -54,7 +54,7 @@ export default function Step1Stay() {
     <div className={styles.card}>
       <h2 className={styles.title}>Your stay</h2>
       <p className={styles.subtitle}>
-        You are booking the whole apartment for the group — dates, guest count, and breakfast.
+        You are booking the whole apartment for the group — choose dates and breakfast. Guest count is on the next step.
       </p>
       {blocked && stay.checkIn && stay.checkOut && (
         <p className={styles.dateError}>{guestClosureMessage(blocked)}</p>
@@ -67,29 +67,6 @@ export default function Step1Stay() {
         roomSlugs={rooms.map((room) => room.roomId)}
         onChange={(next) => setStay({ checkIn: next.checkIn, checkOut: next.checkOut })}
       />
-
-      <div className={styles.fields}>
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>Adults *</span>
-          <input
-            type="number"
-            min={1}
-            value={stay.adults}
-            onChange={(e) => setStay({ adults: Math.max(1, Number(e.target.value) || 1) })}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>Children</span>
-          <input
-            type="number"
-            min={0}
-            value={stay.children}
-            onChange={(e) => setStay({ children: Math.max(0, Number(e.target.value) || 0) })}
-          />
-        </label>
-      </div>
 
       <label className={styles.breakfast}>
         <input

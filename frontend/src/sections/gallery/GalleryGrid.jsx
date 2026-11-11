@@ -1,57 +1,41 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { GALLERY_CATEGORIES } from '@features/hotel/gallery/categories';
 import { useGalleryPage } from '@lib/queries/useGalleryPage';
 import Reveal from '@components/ui/Reveal';
 import styles from './GalleryGrid.module.css';
 
+const PAGE_SIZE = 15;
+
 export default function GalleryGrid() {
   const { data } = useGalleryPage();
-  const { images: galleryImages } = data;
-  const [activeCategory, setActiveCategory] = useState('all');
+  const images = data.images || [];
+  const [page, setPage] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
-  const filtered =
-    activeCategory === 'all'
-      ? galleryImages
-      : galleryImages.filter((img) => img.category === activeCategory);
+  const pageCount = Math.max(1, Math.ceil(images.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount - 1);
+  const start = currentPage * PAGE_SIZE;
+  const visible = images.slice(start, start + PAGE_SIZE);
 
-  const openLightbox = (index) => setLightboxIndex(index);
+  const openLightbox = (index) => setLightboxIndex(start + index);
   const closeLightbox = () => setLightboxIndex(null);
-  const showNext = () => setLightboxIndex((i) => (i + 1) % filtered.length);
-  const showPrev = () => setLightboxIndex((i) => (i - 1 + filtered.length) % filtered.length);
+  const showNext = () => setLightboxIndex((i) => (i + 1) % images.length);
+  const showPrev = () => setLightboxIndex((i) => (i - 1 + images.length) % images.length);
 
-  const handleFilterChange = (categoryId) => {
-    setActiveCategory(categoryId);
+  function goToPage(next) {
+    setPage(next);
     setLightboxIndex(null);
-  };
+  }
 
   return (
     <section className={styles.section}>
       <div className="container">
-        <Reveal className={styles.filters} role="tablist" aria-label="Filter gallery by category">
-          {GALLERY_CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              role="tab"
-              aria-selected={activeCategory === cat.id}
-              className={`${styles.filterBtn} ${
-                activeCategory === cat.id ? styles.filterBtnActive : ''
-              }`}
-              onClick={() => handleFilterChange(cat.id)}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </Reveal>
-
-        <div className={styles.masonry}>
-          {filtered.map((img, i) => (
-            <Reveal key={`${activeCategory}-${img.id}`} delay={(i % 8) * 60}>
+        <div className={styles.grid}>
+          {visible.map((img, i) => (
+            <Reveal key={img.id} delay={(i % 3) * 60}>
               <button
                 type="button"
-                className={`${styles.tile} ${styles[`aspect${capitalize(img.aspect || 'square')}`]}`}
+                className={styles.tile}
                 style={{ backgroundImage: `url(${img.image})` }}
                 onClick={() => openLightbox(i)}
                 aria-label={`Open photo: ${img.caption}`}
@@ -62,14 +46,37 @@ export default function GalleryGrid() {
             </Reveal>
           ))}
         </div>
-        {filtered.length === 0 && (
-          <p className={styles.empty}>No photos in this category yet.</p>
+        {images.length === 0 && <p className={styles.empty}>No photos yet.</p>}
+        {pageCount > 1 && (
+          <nav className={styles.pager} aria-label="Gallery pages">
+            <button type="button" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 0}>
+              Previous
+            </button>
+            {Array.from({ length: pageCount }, (_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-current={index === currentPage ? 'page' : undefined}
+                className={index === currentPage ? styles.pageActive : undefined}
+                onClick={() => goToPage(index)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === pageCount - 1}
+            >
+              Next
+            </button>
+          </nav>
         )}
       </div>
 
       {lightboxIndex !== null && (
         <GalleryLightbox
-          images={filtered}
+          images={images}
           activeIndex={lightboxIndex}
           onClose={closeLightbox}
           onNext={showNext}
@@ -78,10 +85,6 @@ export default function GalleryGrid() {
       )}
     </section>
   );
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function GalleryLightbox({ images, activeIndex, onClose, onNext, onPrev }) {

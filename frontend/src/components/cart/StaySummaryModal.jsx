@@ -69,10 +69,14 @@ export default function StaySummaryModal({ onClose }) {
 
               <h3 className={styles.roomName}>{room.name}</h3>
               <p className={styles.datesNote}>Dates — add on confirm booking page</p>
-              <p className={styles.guests}>
-                {room.adults} {room.adults === 1 ? 'Adult' : 'Adults'}, {room.children}{' '}
-                {room.children === 1 ? 'Child' : 'Children'}
-              </p>
+              {room.guestsConfirmed ? (
+                <p className={styles.guests}>
+                  {room.adults + room.children}{' '}
+                  {room.adults + room.children === 1 ? 'guest' : 'guests'}
+                </p>
+              ) : (
+                <p className={styles.datesNote}>Guests — add on the next page</p>
+              )}
 
               <p className={styles.roomPrice}>${room.pricePerNight.toFixed(2)}</p>
             </div>

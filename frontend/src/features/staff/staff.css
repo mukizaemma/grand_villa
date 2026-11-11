@@ -359,7 +359,14 @@ label.staffBtn {
 
 .rowActions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.staffTable th:last-child,
+.staffTable td:last-child {
+  width: 1%;
+  text-align: right;
 }
 
 .iconBtn {
@@ -374,6 +381,11 @@ label.staffBtn {
 
 .iconView {
   background: #c88b4a;
+  color: #fff;
+}
+
+.iconEdit {
+  background: #1a2b4b;
   color: #fff;
 }
 

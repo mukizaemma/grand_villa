@@ -1,4 +1,5 @@
 import { APIError } from 'payload'
+import { rowActionsField } from '../../../core/fields/rowActions.js'
 import { assertBookingCreateRateLimit } from '../../../core/security/rateLimit.js'
 import { findUnavailableStay } from './availability.js'
 import { calcStayTotal, nightlyRate, nightsBetween } from './pricing.js'
@@ -24,7 +25,7 @@ export const Bookings = {
   admin: {
     group: false,
     useAsTitle: 'guestName',
-    defaultColumns: ['guestName', 'confirmationMethod', 'checkIn', 'checkOut', 'status'],
+    defaultColumns: ['guestName', 'confirmationMethod', 'checkIn', 'checkOut', 'status', 'rowActions'],
   },
   hooks: {
     beforeValidate: [
@@ -145,6 +146,7 @@ export const Bookings = {
     ],
   },
   fields: [
+    rowActionsField,
     {
       name: 'guestName',
       type: 'text',
@@ -214,6 +216,15 @@ export const Bookings = {
       defaultValue: 0,
       min: 0,
       admin: { width: '25%' },
+    },
+    {
+      name: 'beds',
+      type: 'number',
+      min: 0,
+      admin: {
+        width: '25%',
+        description: 'Beds to prepare. Each bed hosts up to 2 guests.',
+      },
     },
     {
       name: 'guest',

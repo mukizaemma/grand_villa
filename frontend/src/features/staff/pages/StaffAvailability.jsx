@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { formatDay } from '@features/hotel/availability'
 import { staffClient } from '../api/staffClient'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import '../staff.css'
 
@@ -18,6 +19,19 @@ export default function StaffAvailability() {
   const [rows, setRows] = useState([])
   const [rooms, setRooms] = useState([])
   const [form, setForm] = useState(null)
+  const [view, setView] = useState(null)
+
+  function openEdit(row) {
+    setForm({
+      id: row.id,
+      scope: row.scope || 'hotel',
+      startDate: String(row.startDate || '').slice(0, 10),
+      reopenDate: String(row.reopenDate || '').slice(0, 10),
+      note: row.note || '',
+      guestMessage: row.guestMessage || '',
+      rooms: (row.rooms || []).map((room) => room.id || room),
+    })
+  }
 
   async function load() {
     const [blocks, roomList] = await Promise.all([
@@ -53,8 +67,13 @@ export default function StaffAvailability() {
       rooms: form.scope === 'room' ? form.rooms : [],
     }
     try {
-      await staffClient.post('/api/availability-blocks', payload)
-      toast.success('Those dates are now closed on the website.')
+      if (form.id) {
+        await staffClient.patch(`/api/availability-blocks/${form.id}`, payload)
+        toast.success('Closed dates updated.')
+      } else {
+        await staffClient.post('/api/availability-blocks', payload)
+        toast.success('Those dates are now closed on the website.')
+      }
       setForm(null)
       load()
     } catch (err) {
@@ -103,7 +122,7 @@ export default function StaffAvailability() {
               <th>What</th>
               <th>Note</th>
               <th>Status</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -119,16 +138,7 @@ export default function StaffAvailability() {
                 <td>{row.note || '—'}</td>
                 <td>{row.active === false ? 'Open again' : 'Closed'}</td>
                 <td>
-                  <div className="rowActions">
-                    {row.active !== false && (
-                      <button type="button" className="staffBtn" onClick={() => reopen(row.id)}>
-                        Open again
-                      </button>
-                    )}
-                    <button type="button" className="staffBtn staffBtnDanger" onClick={() => remove(row.id)}>
-                      Delete
-                    </button>
-                  </div>
+                  <RowActions onView={() => setView(row)} onEdit={() => openEdit(row)} onDelete={() => remove(row.id)} />
                 </td>
               </tr>
             ))}
@@ -141,8 +151,27 @@ export default function StaffAvailability() {
         </table>
       </div>
 
+      {view && (
+        <StaffModal title="Closed dates" onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>First full night</strong><br />{formatDay(view.startDate)}</p>
+            <p><strong>Guests can book from</strong><br />{formatDay(view.reopenDate)}</p>
+            <p><strong>What</strong><br />{view.scope === 'hotel' ? 'Whole property' : (view.rooms || []).map((room) => room.name || room).join(', ') || 'Rooms'}</p>
+            <p><strong>Status</strong><br />{view.active === false ? 'Open again' : 'Closed'}</p>
+            <p className="full"><strong>Note</strong><br />{view.note || '—'}</p>
+          </div>
+          <div className="formActions full">
+            <button type="button" className="staffBtn staffBtnGhost" onClick={() => setView(null)}>Close</button>
+            {view.active !== false && (
+              <button type="button" className="staffBtn" onClick={() => { reopen(view.id); setView(null) }}>Open again</button>
+            )}
+            <button type="button" className="staffBtn" onClick={() => { openEdit(view); setView(null) }}>Edit</button>
+          </div>
+        </StaffModal>
+      )}
+
       {form && (
-        <StaffModal title="Close dates" onClose={() => setForm(null)}>
+        <StaffModal title={form.id ? 'Edit closed dates' : 'Close dates'} onClose={() => setForm(null)}>
           <form onSubmit={save} className="formGrid">
             <label className="staffField col-6">
               Close

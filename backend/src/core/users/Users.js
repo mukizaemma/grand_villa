@@ -1,4 +1,5 @@
 import { previewUpload } from '../fields/pageHero.js'
+import { rowActionsField } from '../fields/rowActions.js'
 
 const isLoggedIn = ({ req: { user } }) => Boolean(user)
 
@@ -54,7 +55,7 @@ export const Users = {
   admin: {
     group: false,
     useAsTitle: 'email',
-    defaultColumns: ['email', 'firstName', 'lastName', 'role', 'status'],
+    defaultColumns: ['email', 'firstName', 'lastName', 'role', 'status', 'rowActions'],
     description: 'Staff who can sign in to this CMS. Guests on the public site never use these accounts.',
   },
   access: {
@@ -64,6 +65,7 @@ export const Users = {
     delete: isLoggedIn,
   },
   fields: [
+    rowActionsField,
     { name: 'firstName', type: 'text', admin: { width: '25%' } },
     { name: 'lastName', type: 'text', admin: { width: '25%' } },
     { name: 'name', type: 'text', admin: { width: '25%', description: 'Optional display name if first/last are empty' } },

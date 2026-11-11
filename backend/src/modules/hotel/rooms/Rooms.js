@@ -1,5 +1,6 @@
 import { applyAutoSlug } from '../../../core/fields/slug.js'
 import { previewUpload } from '../../../core/fields/pageHero.js'
+import { rowActionsField } from '../../../core/fields/rowActions.js'
 
 export const Rooms = {
   slug: 'rooms',
@@ -13,7 +14,7 @@ export const Rooms = {
   admin: {
     group: false,
     useAsTitle: 'name',
-    defaultColumns: ['image', 'name', 'pricePerNight', 'priceWithBreakfast', 'monthlyRate'],
+    defaultColumns: ['image', 'name', 'pricePerNight', 'priceWithBreakfast', 'monthlyRate', 'rowActions'],
     description: 'The whole villa guests book. Keep a single listing — this is not a hotel of room types.',
   },
   hooks: {
@@ -60,6 +61,7 @@ export const Rooms = {
     ],
   },
   fields: [
+    rowActionsField,
     {
       name: 'name',
       type: 'text',

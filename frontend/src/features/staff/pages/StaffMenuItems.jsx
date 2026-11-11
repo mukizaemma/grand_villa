@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { asHtml, htmlToLexical } from '@lib/richText'
+import { asHtml, asPlain, htmlToLexical } from '@lib/richText'
 import { mediaUrl } from '@features/hotel/adapters'
 import { MENU_CATEGORIES, MENU_DIETARY, formatMoney } from '@features/hotel/menu'
 import { staffClient, mediaId } from '../api/staffClient'
 import { slugify } from '../lib/slugify'
 import MediaField from '../components/MediaField'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import SummernoteField from '../components/SummernoteField'
 import '../staff.css'
@@ -29,6 +30,7 @@ const empty = {
 export default function StaffMenuItems() {
   const [rows, setRows] = useState([])
   const [form, setForm] = useState(null)
+  const [view, setView] = useState(null)
 
   async function load() {
     const { data } = await staffClient.get('/api/menu-items?limit=200&sort=sort&depth=1')
@@ -127,7 +129,7 @@ export default function StaffMenuItems() {
               <th>Category</th>
               <th>Price</th>
               <th>On menu</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -145,14 +147,7 @@ export default function StaffMenuItems() {
                 <td>{formatMoney(row.price)}</td>
                 <td>{row.available === false ? 'Hidden' : 'Yes'}</td>
                 <td>
-                  <div className="rowActions">
-                    <button type="button" className="staffBtn" onClick={() => openEdit(row)}>
-                      Edit
-                    </button>
-                    <button type="button" className="staffBtn staffBtnDanger" onClick={() => remove(row.id)}>
-                      Delete
-                    </button>
-                  </div>
+                  <RowActions onView={() => setView(row)} onEdit={() => openEdit(row)} onDelete={() => remove(row.id)} />
                 </td>
               </tr>
             ))}
@@ -164,6 +159,21 @@ export default function StaffMenuItems() {
           </tbody>
         </table>
       </div>
+
+      {view && (
+        <StaffModal title={view.name || 'Menu item'} onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>Category</strong><br />{view.category || '—'}</p>
+            <p><strong>Price</strong><br />{formatMoney(view.price)}</p>
+            <p><strong>On menu</strong><br />{view.available === false ? 'Hidden' : 'Yes'}</p>
+            <p className="full"><strong>Description</strong><br />{asPlain(view.description) || '—'}</p>
+          </div>
+          <div className="formActions full">
+            <button type="button" className="staffBtn staffBtnGhost" onClick={() => setView(null)}>Close</button>
+            <button type="button" className="staffBtn" onClick={() => { openEdit(view); setView(null) }}>Edit</button>
+          </div>
+        </StaffModal>
+      )}
 
       {form && (
         <StaffModal title={form.id ? 'Edit menu item' : 'Add menu item'} wide onClose={() => setForm(null)}>

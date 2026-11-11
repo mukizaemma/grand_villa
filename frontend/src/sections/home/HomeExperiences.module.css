@@ -78,15 +78,6 @@
   line-height: 1.6;
 }
 
-.body strong {
-  margin-top: auto;
-  padding-top: 0.7rem;
-  color: var(--color-gold);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .more {
   display: flex;
   justify-content: center;

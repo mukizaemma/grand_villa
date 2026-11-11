@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import { FieldLabel, useField, useListDrawer } from '@payloadcms/ui'
+import React, { useEffect, useMemo, useState } from 'react'
+import { FieldLabel, useField, useForm, useFormFields, useListDrawer } from '@payloadcms/ui'
 import { formatBytes, prepareUploadFiles, uploadPreparedFile } from '../prepareImage.js'
 import './mediaGridField.css'
 
 function mediaId(value) {
   if (!value) return ''
-  if (typeof value === 'object') return value.id || value._id || ''
+  if (typeof value === 'object') return String(value.id || value._id || '')
   return String(value)
 }
 
@@ -22,16 +22,96 @@ function imageKey(field) {
 }
 
 export function MediaGridField({ field, path, readOnly }) {
-  const { value, setValue } = useField({ path })
   const key = useMemo(() => imageKey(field), [field])
-  const rows = Array.isArray(value) ? value : []
+  useField({ hasRows: true, path })
+  const { addFieldRow, removeFieldRow } = useForm()
+  const rowState = useFormFields(([fields]) => {
+    const count = fields[path]?.rows?.length || Number(fields[path]?.value) || 0
+    const parts = []
+    for (let index = 0; index < count; index += 1) {
+      const rowId = mediaId(fields[`${path}.${index}.id`]?.value) || String(index)
+      const photoId = mediaId(fields[`${path}.${index}.${key}`]?.value)
+      parts.push(`${rowId}:${photoId}`)
+    }
+    return parts.join('|')
+  })
+  const rows = useMemo(
+    () =>
+      rowState
+        ? rowState.split('|').map((part) => {
+            const splitAt = part.indexOf(':')
+            return {
+              id: part.slice(0, splitAt),
+              photoId: part.slice(splitAt + 1),
+            }
+          })
+        : [],
+    [rowState],
+  )
   const max = field?.maxRows || 24
+  const [docs, setDocs] = useState({})
   const [queue, setQueue] = useState([])
   const [busy, setBusy] = useState(false)
   const [ListDrawer, , { openDrawer, closeDrawer }] = useListDrawer({
     collectionSlugs: ['media'],
     uploads: true,
   })
+
+  useEffect(() => {
+    const missing = [...new Set(rows.map((row) => row.photoId).filter((id) => id && !(id in docs)))]
+    if (!missing.length) return undefined
+    let cancelled = false
+    Promise.all(
+      missing.map((id) =>
+        fetch(`/api/media/${id}?depth=0`, { credentials: 'include' })
+          .then((res) => (res.ok ? res.json() : null))
+          .then((doc) => [id, doc])
+          .catch(() => [id, null]),
+      ),
+    ).then((pairs) => {
+      if (cancelled) return
+      setDocs((current) => {
+        const next = { ...current }
+        for (const [id, doc] of pairs) {
+          next[id] = doc || current[id] || { id }
+        }
+        return next
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [rows, docs])
+
+  function remember(doc) {
+    const id = mediaId(doc)
+    if (!id || typeof doc !== 'object') return
+    setDocs((current) => ({ ...current, [id]: doc }))
+  }
+
+  function addIds(ids, knownDocs = []) {
+    knownDocs.forEach(remember)
+    const known = new Set(rows.map((row) => row.photoId).filter(Boolean))
+    let index = rows.length
+    for (const raw of ids) {
+      const id = mediaId(raw)
+      if (!id || known.has(id) || index >= max) continue
+      known.add(id)
+      addFieldRow({
+        path,
+        rowIndex: index,
+        subFieldState: {
+          [key]: {
+            initialValue: id,
+            valid: true,
+            value: id,
+          },
+        },
+      })
+      index += 1
+    }
+    closeDrawer()
+  }
 
   async function pickFiles(event) {
     const files = event.target.files
@@ -55,10 +135,12 @@ export function MediaGridField({ field, path, readOnly }) {
     try {
       const uploaded = []
       for (const item of queue) {
-        const doc = await uploadPreparedFile(item.file)
-        uploaded.push({ [key]: doc.id || doc })
+        uploaded.push(await uploadPreparedFile(item.file))
       }
-      setValue([...rows, ...uploaded].slice(0, max))
+      addIds(
+        uploaded.map((doc) => doc.id || doc),
+        uploaded,
+      )
       queue.forEach((item) => URL.revokeObjectURL(item.preview))
       setQueue([])
     } catch {
@@ -69,7 +151,7 @@ export function MediaGridField({ field, path, readOnly }) {
   }
 
   function removeAt(index) {
-    setValue(rows.filter((_, i) => i !== index))
+    removeFieldRow({ path, rowIndex: index })
   }
 
   return (
@@ -81,10 +163,9 @@ export function MediaGridField({ field, path, readOnly }) {
 
       <div className="media-grid-field__grid">
         {rows.map((row, index) => {
-          const doc = typeof row?.[key] === 'object' ? row[key] : null
-          const src = mediaSrc(doc)
+          const src = mediaSrc(docs[row.photoId])
           return (
-            <article key={mediaId(row?.[key]) || index}>
+            <article key={row.id || index}>
               {src ? <img src={src} alt="" /> : <div className="media-grid-field__empty">Photo {index + 1}</div>}
               {!readOnly && (
                 <button type="button" onClick={() => removeAt(index)}>
@@ -141,13 +222,17 @@ export function MediaGridField({ field, path, readOnly }) {
       )}
 
       <ListDrawer
+        enableRowSelections
+        onBulkSelect={(selected) => {
+          const ids = []
+          selected?.forEach?.((isSelected, id) => {
+            if (isSelected) ids.push(id)
+          })
+          addIds(ids)
+        }}
         onSelect={(args) => {
           const doc = args?.doc || args?.value || args
-          const id = mediaId(doc)
-          if (!id || rows.length >= max) return
-          if (rows.some((row) => mediaId(row?.[key]) === id)) return
-          setValue([...rows, { [key]: id }])
-          closeDrawer()
+          addIds([mediaId(doc)], [doc])
         }}
       />
     </div>

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { staffClient } from '../api/staffClient'
+import RowActions from '../components/RowActions'
+import StaffModal from '../components/StaffModal'
 import '../staff.css'
 
 function day(value) {
@@ -11,6 +13,7 @@ function day(value) {
 
 export default function StaffDashboard() {
   const [bookings, setBookings] = useState([])
+  const [view, setView] = useState(null)
 
   useEffect(() => {
     staffClient
@@ -58,6 +61,7 @@ export default function StaffDashboard() {
               <th>Check-in</th>
               <th>Status</th>
               <th>Total</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -70,16 +74,29 @@ export default function StaffDashboard() {
                 <td>
                   {row.currency || 'USD'} {row.total}
                 </td>
+                <td>
+                  <RowActions onView={() => setView(row)} />
+                </td>
               </tr>
             ))}
             {bookings.length === 0 && (
               <tr>
-                <td colSpan={5}>No reservations yet.</td>
+                <td colSpan={6}>No reservations yet.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      {view && (
+        <StaffModal title={view.guestName || 'Reservation'} onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>Room</strong><br />{view.rooms?.[0]?.name || '—'}</p>
+            <p><strong>Check-in</strong><br />{day(view.checkIn)}</p>
+            <p><strong>Status</strong><br />{view.status}</p>
+            <p><strong>Total</strong><br />{view.currency || 'USD'} {view.total}</p>
+          </div>
+        </StaffModal>
+      )}
       <p style={{ marginTop: '0.85rem' }}>
         <Link to="/staff/reservations">View all reservations →</Link>
       </p>

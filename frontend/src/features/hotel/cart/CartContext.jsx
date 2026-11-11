@@ -54,8 +54,9 @@ function cartReducer(state, action) {
             roomId: room.id,
             name: room.name,
             pricePerNight: room.pricePerNight,
-            adults: 6,
+            adults: 0,
             children: 0,
+            guestsConfirmed: false,
             priceWithBreakfast: room.priceWithBreakfast,
             monthlyRate: room.monthlyRate,
           },
@@ -69,7 +70,12 @@ function cartReducer(state, action) {
         ...state,
         rooms: state.rooms.map((r) =>
           r.roomId === action.roomId
-            ? { ...r, adults: action.adults, children: action.children }
+            ? {
+                ...r,
+                adults: action.adults,
+                children: action.children,
+                guestsConfirmed: action.adults > 0,
+              }
             : r,
         ),
       };

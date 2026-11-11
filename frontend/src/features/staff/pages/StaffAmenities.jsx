@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { asHtml, htmlToLexical } from '@lib/richText'
+import { asHtml, asPlain, htmlToLexical } from '@lib/richText'
 import { mediaUrl } from '@features/hotel/adapters'
 import { staffClient, mediaId } from '../api/staffClient'
 import { slugify } from '../lib/slugify'
 import MediaField from '../components/MediaField'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import SummernoteField from '../components/SummernoteField'
 import '../staff.css'
@@ -14,6 +15,19 @@ const empty = { name: '', slug: '', icon: 'wifi', description: '', image: '', so
 export default function StaffAmenities() {
   const [rows, setRows] = useState([])
   const [form, setForm] = useState(null)
+  const [view, setView] = useState(null)
+
+  function openEdit(row) {
+    setForm({
+      id: row.id,
+      name: row.name || '',
+      slug: row.slug || '',
+      icon: row.icon || 'wifi',
+      description: asHtml(row.description),
+      image: row.image || '',
+      sort: row.sort ?? 0,
+    })
+  }
 
   async function load() {
     const { data } = await staffClient.get('/api/amenities?limit=100&sort=sort&depth=1')
@@ -71,7 +85,7 @@ export default function StaffAmenities() {
               <th></th>
               <th>Name</th>
               <th>Icon</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -87,34 +101,27 @@ export default function StaffAmenities() {
                 <td>{row.name}</td>
                 <td>{row.icon}</td>
                 <td>
-                  <div className="rowActions">
-                    <button
-                      type="button"
-                      className="staffBtn"
-                      onClick={() =>
-                        setForm({
-                          id: row.id,
-                          name: row.name || '',
-                          slug: row.slug || '',
-                          icon: row.icon || 'wifi',
-                          description: asHtml(row.description),
-                          image: row.image || '',
-                          sort: row.sort || 0,
-                        })
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button type="button" className="staffBtn staffBtnDanger" onClick={() => remove(row.id)}>
-                      Delete
-                    </button>
-                  </div>
+                  <RowActions onView={() => setView(row)} onEdit={() => openEdit(row)} onDelete={() => remove(row.id)} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {view && (
+        <StaffModal title={view.name || 'Amenity'} onClose={() => setView(null)}>
+          <div className="detailGrid">
+            <p><strong>Icon</strong><br />{view.icon || '—'}</p>
+            <p><strong>Order</strong><br />{view.sort ?? 0}</p>
+            <p className="full"><strong>Description</strong><br />{asPlain(view.description) || '—'}</p>
+          </div>
+          <div className="formActions full">
+            <button type="button" className="staffBtn staffBtnGhost" onClick={() => setView(null)}>Close</button>
+            <button type="button" className="staffBtn" onClick={() => { openEdit(view); setView(null) }}>Edit</button>
+          </div>
+        </StaffModal>
+      )}
+
       {form && (
         <StaffModal title={form.id ? 'Edit amenity' : 'Add amenity'} wide onClose={() => setForm(null)}>
           <form onSubmit={save} className="formGrid">

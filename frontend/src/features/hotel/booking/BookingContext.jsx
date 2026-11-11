@@ -21,8 +21,10 @@ const STORAGE_KEY = 'gv-booking-stay';
 const defaultStay = {
   checkIn: '',
   checkOut: '',
-  adults: 6,
+  adults: '',
   children: 0,
+  beds: '',
+  guestsConfirmed: false,
   includeBreakfast: false,
 };
 
@@ -36,7 +38,7 @@ const defaultGuest = {
 };
 
 const defaultDetails = {
-  paymentMethod: 'pay-at-hotel', // only option today — see pricing plan for adding online payment later
+  paymentMethod: 'pay-at-hotel',
   confirmationMethod: '',
   agreedToTerms: false,
 };
@@ -46,9 +48,16 @@ function loadInitial() {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return { step: 1, stay: defaultStay, guest: defaultGuest, details: defaultDetails };
     const parsed = JSON.parse(raw);
+    const stay = { ...defaultStay, ...parsed.stay };
+    // Older sessions stored a placeholder of 6 guests before anyone typed a count.
+    if (!stay.guestsConfirmed) {
+      stay.adults = '';
+      stay.children = 0;
+      stay.guestsConfirmed = false;
+    }
     return {
       step: parsed.step && parsed.step >= 1 && parsed.step <= 3 ? parsed.step : 1,
-      stay: { ...defaultStay, ...parsed.stay },
+      stay,
       guest: { ...defaultGuest, ...parsed.guest },
       details: { ...defaultDetails, ...parsed.details, confirmationMethod: '' },
     };

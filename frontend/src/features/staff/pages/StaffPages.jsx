@@ -9,6 +9,7 @@ import { EXPERIENCES_SECTION, ROOMS_SECTION } from '@features/hotel/lakeStay'
 import { staffClient, mediaId } from '../api/staffClient'
 import MediaField from '../components/MediaField'
 import MediaGalleryField from '../components/MediaGalleryField'
+import RowActions from '../components/RowActions'
 import StaffModal from '../components/StaffModal'
 import SummernoteField from '../components/SummernoteField'
 import '../staff.css'
@@ -184,6 +185,7 @@ function readPage(slug, page) {
       headline: page.headline || '',
       intro: asHtml(page.intro),
       backgroundImage: page.backgroundImage || '',
+      photos: (page.photos || []).map((item) => item.image).filter(Boolean),
       ctaLabel: page.cta?.label || '',
       ctaPath: page.cta?.path || page.cta?.link || '',
       secondaryLabel: page.secondaryCta?.label || '',
@@ -298,6 +300,9 @@ function writePage(slug, current, form) {
       headline: form.headline,
       intro: htmlToLexical(form.intro),
       backgroundImage: mediaId(form.backgroundImage) || undefined,
+      photos: (form.photos || [])
+        .map((image) => ({ image: mediaId(image) || undefined }))
+        .filter((row) => row.image),
       ...ctas,
     }
   }
@@ -399,7 +404,7 @@ export default function StaffPages() {
             <tr>
               <th>Page</th>
               <th>URL</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -408,9 +413,10 @@ export default function StaffPages() {
                 <td>{page.label}</td>
                 <td>{page.path}</td>
                 <td>
-                  <button type="button" className="staffBtn" onClick={() => open(page)}>
-                    Edit
-                  </button>
+                  <RowActions
+                    onView={() => window.open(page.path, '_blank', 'noopener')}
+                    onEdit={() => open(page)}
+                  />
                 </td>
               </tr>
             ))}
@@ -822,6 +828,17 @@ export default function StaffPages() {
                   onSecondaryLabel={(secondaryLabel) => setForm({ ...form, secondaryLabel })}
                   onSecondaryPath={(secondaryPath) => setForm({ ...form, secondaryPath })}
                 />
+                {form.slug === 'gallery-page' && (
+                  <div className="full">
+                    <MediaGalleryField
+                      label="Gallery photos"
+                      hint="Upload several photos, or choose existing ones. They all show together — no category."
+                      values={form.photos}
+                      max={200}
+                      onChange={(photos) => setForm({ ...form, photos })}
+                    />
+                  </div>
+                )}
                 {form.slug === 'contact-page' && (
                   <>
                     <label className="staffField col-3">

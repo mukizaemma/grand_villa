@@ -38,25 +38,38 @@ const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const EMAIL_CONFIGURED = Boolean(SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY);
 
-export function buildSummaryText({ rooms, experiences, stay, nights, guest, total }) {
+export function buildSummaryText({ rooms, experiences, stay, nights, guest, total, bookingId }) {
   const roomLines = rooms
     .map((r) => `- ${r.name} (${stay.includeBreakfast ? 'with breakfast' : 'without breakfast'})`)
     .join('\n');
   const experienceLines = experiences.length
     ? `\nExperiences:\n${experiences.map((e) => `- ${e.name} ($${e.price})`).join('\n')}`
     : '';
+  const adults = Number(stay.adults) || 0;
+  const children = Number(stay.children) || 0;
+  const guestLine = children ? `${adults} adult(s), ${children} child(ren)` : `${adults} adult(s)`;
 
   return [
     `New booking request — ${guest.firstName} ${guest.lastName}`,
+    bookingId ? `Reference: ${bookingId}` : null,
     `Dates: ${stay.checkIn} → ${stay.checkOut} (${nights} night(s))`,
+    `Guests: ${guestLine}`,
+    Number(stay.beds) ? `Beds to prepare: ${Number(stay.beds)} (up to 2 guests each)` : null,
     `Stay:\n${roomLines}${experienceLines}`,
     `Total: $${total.toFixed(2)}`,
     `Mobile: ${guest.mobile}`,
     guest.email ? `Email: ${guest.email}` : null,
+    guest.country ? `Country: ${guest.country}` : null,
     guest.specialRequests ? `Special requests: ${guest.specialRequests}` : null,
   ]
     .filter(Boolean)
     .join('\n');
+}
+
+export function whatsappUrl(company, summaryText) {
+  const hotelWhatsApp = String(company?.whatsapp || company?.phone || '').replace(/[^\d]/g, '');
+  if (!hotelWhatsApp) return '';
+  return `https://wa.me/${hotelWhatsApp}?text=${encodeURIComponent(summaryText)}`;
 }
 
 /**
@@ -78,8 +91,9 @@ export async function createBookingRequest({ rooms, experiences, stay, guest, de
     })),
     checkIn: stay.checkIn,
     checkOut: stay.checkOut,
-    adults: stay.adults,
-    children: stay.children,
+    adults: Number(stay.adults) || 0,
+    children: Number(stay.children) || 0,
+    beds: Number(stay.beds) || 0,
     includeBreakfast: Boolean(stay.includeBreakfast),
     guest: {
       firstName: guest.firstName,
@@ -115,14 +129,22 @@ export async function createBookingRequest({ rooms, experiences, stay, guest, de
  * failure) — the booking is already saved either way, so this is
  * never treated as a submission failure, just a "no receipt" note.
  */
-export async function sendReceipt({ company, confirmationMethod, summaryText, guest }) {
+export async function sendReceipt({ company, confirmationMethod, summaryText, guest, popup }) {
   if (confirmationMethod === 'whatsapp') {
-    const hotelWhatsApp = (company?.phone || '').replace(/[^\d]/g, '');
-    if (!hotelWhatsApp) return false;
-    const url = `https://wa.me/${hotelWhatsApp}?text=${encodeURIComponent(summaryText)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-    return true;
+    const url = whatsappUrl(company, summaryText);
+    if (!url) {
+      popup?.close();
+      return false;
+    }
+    if (popup && !popup.closed) {
+      popup.location.href = url;
+      return true;
+    }
+    const opened = window.open(url, '_blank');
+    return Boolean(opened);
   }
+
+  popup?.close();
 
   if (!EMAIL_CONFIGURED) return false;
   try {
@@ -153,21 +175,25 @@ export function useBookingSubmit() {
 
   async function submit({ rooms, experiences, stay, nights, guest, details, total }) {
     setStatus('submitting');
+    // Open the tab during the click, before the save request, or the browser blocks it.
+    const popup = details.confirmationMethod === 'whatsapp' ? window.open('', '_blank') : null;
 
     let bookingId;
     try {
       bookingId = await createBookingRequest({ rooms, experiences, stay, guest, details, total });
     } catch (err) {
+      popup?.close();
       setStatus(err.code);
       return;
     }
 
-    const summaryText = buildSummaryText({ rooms, experiences, stay, nights, guest, total });
+    const summaryText = buildSummaryText({ rooms, experiences, stay, nights, guest, total, bookingId });
     const sent = await sendReceipt({
       company,
       confirmationMethod: details.confirmationMethod,
       summaryText,
       guest,
+      popup,
     });
     setStatus(sent ? 'success' : 'success-no-receipt');
     return bookingId;

@@ -12,7 +12,6 @@ export default function RoomStayForm({ room }) {
   const { data: closures = [] } = useAvailability()
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
-  const [adults, setAdults] = useState(6)
   const [closed, setClosed] = useState('')
 
   function submit(event) {
@@ -34,7 +33,14 @@ export default function RoomStayForm({ room }) {
         'gv-booking-stay',
         JSON.stringify({
           ...parsed,
-          stay: { ...(parsed.stay || {}), checkIn, checkOut, adults: Number(adults), children: 0 },
+          stay: {
+            ...(parsed.stay || {}),
+            checkIn,
+            checkOut,
+            adults: '',
+            children: 0,
+            guestsConfirmed: false,
+          },
         }),
       )
     } catch {
@@ -58,10 +64,6 @@ export default function RoomStayForm({ room }) {
           setClosed('')
         }}
       />
-      <label>
-        Guests in the group
-        <input type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} />
-      </label>
       {closed && <p className={styles.notice}>{closed}</p>}
       <button type="submit" disabled={!checkIn || !checkOut}>
         Check availability
