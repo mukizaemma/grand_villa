@@ -19,14 +19,17 @@ import {
   ClipboardList,
   BookOpen,
   User,
+  Users,
 } from 'lucide-react'
 import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
 import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
+import { isSuperAdmin } from '../auth/roles'
 import styles from './StaffLayout.module.css'
 
 const NAV = [
-  { to: '/staff/settings', label: 'Site setting', icon: Settings },
+  { to: '/staff/settings', label: 'Site setting', icon: Settings, superOnly: true },
+  { to: '/staff/users', label: 'Users', icon: Users, superOnly: true },
   { to: '/staff/pages?open=home-page', label: 'Home Page', icon: Home },
   { to: '/staff/pages', label: 'Pages', icon: FileText, end: true },
   { to: '/staff/accommodation', label: 'The apartment', icon: BedDouble },
@@ -59,6 +62,8 @@ export default function StaffLayout() {
   if (!ready || !user) return null
 
   const name = user.firstName || user.email
+  const superAdmin = isSuperAdmin(user)
+  const nav = NAV.filter((item) => !item.superOnly || superAdmin)
 
   return (
     <div className={styles.shell}>
@@ -75,7 +80,7 @@ export default function StaffLayout() {
           </div>
         </div>
         <nav>
-          {NAV.map(({ to, label, icon: Icon, end }) => (
+          {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}

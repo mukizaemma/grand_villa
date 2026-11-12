@@ -12,6 +12,10 @@
   padding: 1.25rem 0.9rem 1rem;
   background: #1a2b4b;
   color: #f7efe2;
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow: auto;
 }
 
 .brand {
@@ -49,19 +53,18 @@
   flex: 1;
 }
 
-.sidebar button {
-  border: 0;
+.sidebar nav a {
+  display: block;
   background: transparent;
   color: inherit;
   text-align: left;
   padding: 0.55rem 0.7rem;
   border-radius: 8px;
-  font: inherit;
-  cursor: pointer;
+  text-decoration: none;
 }
 
-.sidebar button:hover,
-.active {
+.sidebar nav a:hover,
+.sidebar nav a.active {
   background: rgba(196, 165, 116, 0.16);
   color: #e8c992;
 }
@@ -194,6 +197,80 @@
   cursor: pointer;
 }
 
+.notice {
+  margin: 0 0 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: #f3ecdd;
+  color: #1a2b4b;
+}
+
+.status {
+  display: inline-block;
+  margin: 0 0 0.7rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: #e5f4ea;
+  color: #1d6b3a;
+}
+
+.statusSoon {
+  background: #fff4d8;
+  color: #8a5a00;
+}
+
+.statusExpired {
+  background: #fde8e6;
+  color: #9b1c1c;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pager a {
+  color: #1a2b4b;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pager a:hover {
+  color: #c4a574;
+}
+
+.closed {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.6rem;
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  color: #1c2434;
+}
+
+.closed h1 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #1a2b4b;
+}
+
+.closed a {
+  color: #1a2b4b;
+  font-weight: 700;
+}
+
 @media (max-width: 860px) {
   .shell {
     grid-template-columns: 1fr;
@@ -212,7 +289,7 @@
     flex: none;
   }
 
-  .sidebar button {
+  .sidebar nav a {
     white-space: nowrap;
   }
 

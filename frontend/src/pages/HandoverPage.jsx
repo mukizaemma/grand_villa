@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { CMS_URL } from '@lib/apiClient'
 import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
 import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import SiteAuditBoard from '@features/handover/SiteAuditBoard'
 import { HANDOVER_SECTIONS, HANDOVER_TABS } from '@features/handover/guide'
+import { getStaffToken, staffClient } from '@features/staff/api/staffClient'
+import { isSuperAdmin } from '@features/staff/auth/roles'
 import styles from './HandoverPage.module.css'
 
 const SECTIONS = HANDOVER_TABS.map((tab) => tab.id)
@@ -17,34 +19,79 @@ async function readJson(path) {
 }
 
 export default function HandoverPage() {
-  const [tab, setTab] = useState('overview')
+  const { section: sectionId } = useParams()
+  const navigate = useNavigate()
+  const tab = HANDOVER_SECTIONS[sectionId] ? sectionId : ''
   const [report, setReport] = useState(null)
+  const [hosting, setHosting] = useState(null)
+  const [hostingFailed, setHostingFailed] = useState(false)
   const [origin, setOrigin] = useState('')
+  const [available, setAvailable] = useState(true)
+  const [gateReady, setGateReady] = useState(false)
+  const [viewer, setViewer] = useState(null)
   const [form, setForm] = useState({ name: '', email: '', section: 'overview', message: '' })
   const [busy, setBusy] = useState(false)
   const { data: layout } = useSiteLayout()
   const brand = brandFromCompany(layout?.company)
   const company = layout?.company
+  const superAdmin = isSuperAdmin(viewer)
 
+  const index = Math.max(0, HANDOVER_TABS.findIndex((item) => item.id === tab))
   const section = HANDOVER_SECTIONS[tab] || HANDOVER_SECTIONS.overview
+  const previous = index > 0 ? HANDOVER_TABS[index - 1] : null
+  const next = index < HANDOVER_TABS.length - 1 ? HANDOVER_TABS[index + 1] : null
   const adminUrl = `${CMS_URL}/admin`
+  const closed = gateReady && available === false && !superAdmin
+
+  useEffect(() => {
+    if (sectionId && HANDOVER_SECTIONS[sectionId]) return
+    navigate('/handover/overview', { replace: true })
+  }, [navigate, sectionId])
 
   useEffect(() => {
     setOrigin(window.location.origin)
-    readJson('/api/site-audit/report').then(setReport).catch(() => {})
+    readJson('/api/globals/handover-settings')
+      .then((data) => setAvailable(data?.available !== false))
+      .catch(() => setAvailable(true))
+      .finally(() => setGateReady(true))
+    if (!getStaffToken()) return
+    staffClient
+      .get('/api/users/me')
+      .then((res) => setViewer(res.data?.user || null))
+      .catch(() => setViewer(null))
   }, [])
+
+  useEffect(() => {
+    if (!tab || tab !== 'audit') return
+    readJson('/api/site-audit/report').then(setReport).catch(() => {})
+  }, [tab])
+
+  useEffect(() => {
+    if (!tab || tab !== 'hosting') return
+    readJson('/api/hosting-invoices/summary')
+      .then((data) => {
+        setHosting(data)
+        setHostingFailed(false)
+      })
+      .catch(() => setHostingFailed(true))
+  }, [tab])
 
   useEffect(() => {
     document.title = `Handover — ${brand.name}`
     applyCompanyFavicon(brand.logo)
   }, [brand.logo, brand.name])
 
+  useEffect(() => {
+    if (tab) setForm((current) => ({ ...current, section: tab }))
+  }, [tab])
+
   const credentials = useMemo(
     () => [
       { label: 'Public website', value: origin || '/', href: '/' },
       { label: 'Staff desk', value: origin ? `${origin}/staff` : '/staff', href: '/staff' },
+      { label: 'Create an account', value: origin ? `${origin}/join` : '/join', href: '/join' },
       { label: 'Admin', value: adminUrl, href: adminUrl },
-      { label: 'Login email', value: company?.email || 'The email Ireme sent with your account' },
+      { label: 'Login email', value: company?.email || 'The email on your system account' },
       { label: 'Password', value: 'Not shown here. Use Forgot password if you need a new one.' },
     ],
     [adminUrl, company?.email, origin],
@@ -69,6 +116,21 @@ export default function HandoverPage() {
     }
   }
 
+  if (!gateReady) {
+    return <div className={styles.closed}>Loading the handover guide…</div>
+  }
+
+  if (closed) {
+    return (
+      <div className={styles.closed}>
+        <p className={styles.kicker}>Handover guide</p>
+        <h1>This guide is unavailable</h1>
+        <p>The handover guide has been turned off. New system accounts cannot be created while it is unavailable.</p>
+        <Link to="/">Back to the website</Link>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
@@ -81,17 +143,9 @@ export default function HandoverPage() {
         </Link>
         <nav>
           {HANDOVER_TABS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={tab === item.id ? styles.active : undefined}
-              onClick={() => {
-                setTab(item.id)
-                setForm((current) => ({ ...current, section: item.id }))
-              }}
-            >
+            <Link key={item.id} to={`/handover/${item.id}`} className={tab === item.id ? styles.active : undefined}>
               {item.label}
-            </button>
+            </Link>
           ))}
         </nav>
         <Link to="/" className={styles.back}>
@@ -106,7 +160,15 @@ export default function HandoverPage() {
       </aside>
 
       <main className={styles.main}>
-        <p className={styles.kicker}>For the Grand Villa team</p>
+        {available === false && superAdmin ? (
+          <p className={styles.notice}>
+            This guide is hidden from the public, and /join is not accepting new accounts. You can still read it
+            because you are the super admin.
+          </p>
+        ) : null}
+        <p className={styles.kicker}>
+          Page {index + 1} of {HANDOVER_TABS.length}
+        </p>
         <h1>{section.title}</h1>
         <p className={styles.lead}>{section.lead}</p>
 
@@ -127,12 +189,20 @@ export default function HandoverPage() {
           </div>
         )}
 
+        {tab === 'accounts' && (
+          <p className={styles.card}>
+            <Link to="/join">Open the account page (/join)</Link>
+          </p>
+        )}
+
         {section.blocks.map((block) => (
           <section key={block.heading} className={styles.card}>
             <h2>{block.heading}</h2>
             <p>{block.body}</p>
           </section>
         ))}
+
+        {tab === 'hosting' && <HostingCard hosting={hosting} failed={hostingFailed} />}
 
         {tab === 'audit' && <SiteAuditBoard report={report} />}
 
@@ -170,7 +240,43 @@ export default function HandoverPage() {
             </button>
           </form>
         )}
+
+        <div className={styles.pager}>
+          {previous ? (
+            <Link to={`/handover/${previous.id}`}>← {previous.label}</Link>
+          ) : (
+            <span />
+          )}
+          {next ? <Link to={`/handover/${next.id}`}>{next.label} →</Link> : <span />}
+        </div>
       </main>
     </div>
+  )
+}
+
+function statusClass(status, styles) {
+  if (status === 'active') return styles.statusActive
+  if (status === 'expiring-soon') return styles.statusSoon
+  return styles.statusExpired
+}
+
+function HostingCard({ hosting, failed }) {
+  if (!hosting) {
+    return (
+      <section className={styles.card}>
+        <h2>Current status</h2>
+        <p>{failed ? 'The invoice status will show here once the server is available.' : 'Loading the hosting invoice…'}</p>
+      </section>
+    )
+  }
+  return (
+    <section className={styles.card}>
+      <h2>Current status</h2>
+      <p className={`${styles.status} ${statusClass(hosting.status, styles)}`}>{hosting.statusLabel}</p>
+      <p>
+        Domain on {hosting.registrar}. Hosting on {hosting.host}. ${hosting.annualFee} due {hosting.renewalLabel} each
+        year. This period runs until {hosting.periodEndLabel}.
+      </p>
+    </section>
   )
 }

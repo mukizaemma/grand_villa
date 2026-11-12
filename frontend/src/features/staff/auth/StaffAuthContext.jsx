@@ -11,17 +11,40 @@ export function StaffAuthProvider({ children }) {
     const token = getStaffToken()
     if (!token) {
       setReady(true)
-      return
+      return undefined
     }
     staffClient
       .get('/api/users/me')
       .then((res) => {
-        if (res.data?.user) setUser(res.data.user)
+        if (res.data?.user && res.data.user.status !== 'inactive') setUser(res.data.user)
         else setStaffToken('')
       })
       .catch(() => setStaffToken(''))
       .finally(() => setReady(true))
+    return undefined
   }, [])
+
+  useEffect(() => {
+    if (!user?.id) return undefined
+    const timer = setInterval(() => {
+      staffClient
+        .get('/api/users/me')
+        .then((res) => {
+          const next = res.data?.user
+          if (!next || next.status === 'inactive') {
+            setStaffToken('')
+            setUser(null)
+            return
+          }
+          setUser(next)
+        })
+        .catch(() => {
+          setStaffToken('')
+          setUser(null)
+        })
+    }, 15000)
+    return () => clearInterval(timer)
+  }, [user?.id])
 
   const value = useMemo(
     () => ({

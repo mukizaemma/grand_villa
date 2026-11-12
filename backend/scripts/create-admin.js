@@ -54,6 +54,7 @@ const user = await payload.create({
     status: 'active',
   },
   overrideAccess: true,
+  context: { trustedAccountCreate: true },
 })
 
 console.log(`Created admin ${user.email} (${user.id}) in Atlas database grandvilla.`)

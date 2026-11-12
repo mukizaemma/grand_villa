@@ -604,3 +604,21 @@ label.staffBtn {
   }
 }
 
+.userActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.userActions .staffBtn {
+  padding: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.staffTable select {
+  border: 1px solid #e5ddcd;
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+  background: #fff;
+}
+

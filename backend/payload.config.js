@@ -29,7 +29,10 @@ import { Amenities } from './src/modules/hotel/amenities/Amenities.js'
 import { MenuItems } from './src/modules/hotel/menu/MenuItems.js'
 import { SiteAudit } from './src/core/settings/SiteAudit.js'
 import { UserGuide } from './src/core/settings/UserGuide.js'
+import { HandoverSettings } from './src/core/settings/HandoverSettings.js'
+import { HostingInvoices } from './src/core/hosting/HostingInvoices.js'
 import { HandoverFeedback } from './src/modules/hotel/feedback/HandoverFeedback.js'
+import { registerUserHandler } from './src/core/users/register.js'
 import { withPageNav } from './src/components/payload/PageSwitcher/withPageNav.js'
 import { createEmailAdapter } from './src/core/security/email.js'
 
@@ -68,9 +71,17 @@ export default buildConfig({
       actions: ['./src/components/payload/PageSwitcher/index.jsx#PageSwitcherMenu'],
     },
   },
-  collections: [Users, Media, Rooms, GalleryPhotos, Bookings, AvailabilityBlocks, Experiences, Amenities, MenuItems, HandoverFeedback],
+  collections: [Users, Media, Rooms, GalleryPhotos, Bookings, AvailabilityBlocks, Experiences, Amenities, MenuItems, HandoverFeedback, HostingInvoices],
+  endpoints: [
+    {
+      path: '/join',
+      method: 'post',
+      handler: registerUserHandler,
+    },
+  ],
   globals: [
     Company,
+    HandoverSettings,
     Navigation,
     withPageNav(HomePage),
     withPageNav(RoomsPage),

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { staffClient, mediaId } from '../api/staffClient'
 import MediaField from '../components/MediaField'
 import { SOCIAL_PLATFORMS, emptySocials, normalizeSocials } from '@features/hotel/socials'
+import { useStaffAuth } from '../auth/StaffAuthContext'
+import { isSuperAdmin } from '../auth/roles'
 import '../staff.css'
 
 const empty = {
@@ -25,6 +28,7 @@ const empty = {
 }
 
 export default function StaffSettings() {
+  const { user } = useStaffAuth()
   const queryClient = useQueryClient()
   const [form, setForm] = useState(empty)
   const [loaded, setLoaded] = useState(false)
@@ -58,6 +62,7 @@ export default function StaffSettings() {
     }
   }
 
+  if (user && !isSuperAdmin(user)) return <Navigate to="/staff" replace />
   if (!loaded) return <p>Loading…</p>
 
   return (

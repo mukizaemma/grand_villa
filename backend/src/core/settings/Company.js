@@ -1,16 +1,18 @@
 import { normalizeSocials, SOCIAL_PLATFORMS } from './socials.js'
 import { previewUpload } from '../fields/pageHero.js'
+import { isSuperAdmin } from '../security/roles.js'
 
 export const Company = {
   slug: 'company',
   label: 'Site setting',
   admin: {
     group: false,
-    description: 'Property name, contacts, SEO, and map.',
+    description: 'Property name, contacts, SEO, and map. Only the super admin can change this.',
+    hidden: ({ user }) => !isSuperAdmin(user),
   },
   access: {
     read: () => true,
-    update: ({ req }) => Boolean(req.user),
+    update: ({ req }) => isSuperAdmin(req.user),
   },
   hooks: {
     beforeChange: [

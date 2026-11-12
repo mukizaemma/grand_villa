@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { applyCompanyFavicon, brandFromCompany } from '@features/hotel/companyBrand'
 import { useSiteLayout } from '@lib/queries/useSiteLayout'
 import { useStaffAuth } from '../auth/StaffAuthContext'
@@ -8,6 +8,8 @@ import styles from './StaffLoginPage.module.css'
 export default function StaffLoginPage() {
   const { user, ready, login } = useStaffAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const joined = location.state?.joined
   const { data } = useSiteLayout()
   const brand = brandFromCompany(data?.company)
   const [email, setEmail] = useState('')
@@ -43,7 +45,8 @@ export default function StaffLoginPage() {
       <form className={styles.card} onSubmit={onSubmit}>
         {brand.logo ? <img className={styles.logo} src={brand.logo} alt={brand.name} /> : null}
         <h1>{brand.shortName}</h1>
-        <p>Sign in with your property admin account.</p>
+        <p>Sign in with your property account.</p>
+        {joined ? <p className={styles.note}>Account created for {joined}. Admin access is granted by the super admin.</p> : null}
         <label>
           Email
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -54,6 +57,9 @@ export default function StaffLoginPage() {
         </label>
         <Link to="/staff/forgot" className={styles.forgot}>
           Forgot password?
+        </Link>
+        <Link to="/join" className={styles.forgot}>
+          Create an account
         </Link>
         {error && <p className={styles.error}>{error}</p>}
         <button type="submit" disabled={busy}>

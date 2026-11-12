@@ -3,7 +3,10 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@payloadcms/ui'
 import { ADMIN_PAGES } from '../pageNav.js'
+
+const SUPER_ADMIN_EMAIL = 'admin@iremetech.com'
 
 const BEFORE_PAGES = [{ href: '/admin/globals/company', label: 'Site setting' }]
 
@@ -28,14 +31,15 @@ function isActive(pathname, href) {
 
 export function HotelNav() {
   const pathname = usePathname() || ''
+  const { user } = useAuth()
+  const superAdmin = String(user?.email || '').toLowerCase() === SUPER_ADMIN_EMAIL
   const pageOpen = ADMIN_PAGES.some((item) => isActive(pathname, item.href))
   const [open, setOpen] = useState(pageOpen)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, margin: '0.25rem 0 0.75rem' }}>
-      {BEFORE_PAGES.map((item) => (
-        <NavItem key={item.href} item={item} pathname={pathname} />
-      ))}
+      {superAdmin &&
+        BEFORE_PAGES.map((item) => <NavItem key={item.href} item={item} pathname={pathname} />)}
 
       <button type="button" style={styles.groupBtn} onClick={() => setOpen((value) => !value)}>
         Pages

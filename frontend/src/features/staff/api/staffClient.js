@@ -25,6 +25,21 @@ staffClient.interceptors.request.use((config) => {
   return config
 })
 
+staffClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const url = String(error.config?.url || '')
+    const signingIn = /\/login|\/forgot-password|\/reset-password/.test(url)
+    if (error.response?.status === 401 && getStaffToken() && !signingIn) {
+      setStaffToken('')
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/staff/login')) {
+        window.location.assign('/staff/login')
+      }
+    }
+    return Promise.reject(error)
+  },
+)
+
 export function mediaId(value) {
   if (!value) return ''
   if (typeof value === 'string' || typeof value === 'number') return String(value)

@@ -12,13 +12,10 @@ export function AdminAccountsNote() {
         lineHeight: 1.5,
       }}
     >
-      <strong style={{ display: 'block', marginBottom: 6 }}>Admin accounts</strong>
-      Staff emails and passwords are not stored in Site Settings. Open{' '}
-      <a href="/admin/collections/users" style={{ color: '#15302e', fontWeight: 600 }}>
-        Admin accounts
-      </a>{' '}
-      in the sidebar to create, edit, or deactivate users. The first account was created
-      from the server; add more editors there.
+      <strong style={{ display: 'block', marginBottom: 6 }}>Users</strong>
+      Only admin@iremetech.com can open Users, grant admin access, delete an account, force a
+      logout, or block a login. Everyone else manages website content from the staff desk.
+      New people register at the public /join page while the handover guide is available.
     </div>
   )
 }
